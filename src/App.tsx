@@ -1,26 +1,51 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { FunctionComponent, useEffect, useState } from "react";
+import { Layout, Model, TabNode, IJsonModel } from "flexlayout-react";
+import "./App.css";
+import "flexlayout-react/style/light.css";
+
+const configLayout: IJsonModel = {
+  global: {},
+  borders: [],
+  layout: {
+    type: "row",
+    weight: 100,
+    children: [
+      {
+        type: "tabset",
+        weight: 70,
+        children: [
+          {
+            type: "tab",
+            name: "Scene Renderer",
+            component: "button",
+          },
+        ],
+      },
+      {
+        type: "tabset",
+        weight: 30,
+        children: [
+          {
+            type: "tab",
+            name: "Two",
+            component: "button",
+          },
+        ],
+      },
+    ],
+  },
+};
+const model = Model.fromJson(configLayout);
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const factory = (node: TabNode) => {
+    var component = node.getComponent();
+    if (component === "button") {
+      return <button>{node.getName()}</button>;
+    }
+  };
+
+  return <Layout model={model} factory={factory} />;
 }
 
 export default App;
