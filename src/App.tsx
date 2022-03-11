@@ -2,6 +2,7 @@ import React, { FunctionComponent, useEffect, useState } from "react";
 import { Layout, Model, TabNode, IJsonModel } from "flexlayout-react";
 import "./App.css";
 import "flexlayout-react/style/light.css";
+import SceneRenderer from "./components/scene-renderer/SceneRenderer";
 
 const configLayout: IJsonModel = {
   global: {},
@@ -17,7 +18,7 @@ const configLayout: IJsonModel = {
           {
             type: "tab",
             name: "Scene Renderer",
-            component: "button",
+            component: "scene-renderer",
           },
         ],
       },
@@ -39,9 +40,13 @@ const model = Model.fromJson(configLayout);
 
 function App() {
   const factory = (node: TabNode) => {
-    var component = node.getComponent();
-    if (component === "button") {
-      return <button>{node.getName()}</button>;
+    switch (node.getComponent()) {
+      case "scene-renderer":
+        return <SceneRenderer />;
+      case "button":
+        return <button>{node.getName()}</button>;
+      default:
+        break;
     }
   };
 
