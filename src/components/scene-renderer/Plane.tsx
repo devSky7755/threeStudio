@@ -5,7 +5,7 @@ const Plane = () => (
     <planeBufferGeometry attach="geometry" args={[20, 20]} />
     <meshBasicMaterial
       attach="material"
-      color="#082444"
+      color="grey"
       opacity={0.5}
       transparent
     />
