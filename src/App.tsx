@@ -1,8 +1,8 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
 import { Layout, Model, TabNode, IJsonModel } from "flexlayout-react";
 import "./App.css";
 import "flexlayout-react/style/light.css";
 import SceneRenderer from "./components/scene-renderer/SceneRenderer";
+import { AssetsPanel } from "./components/assets-panel";
 
 const configLayout: IJsonModel = {
   global: {},
@@ -28,8 +28,8 @@ const configLayout: IJsonModel = {
         children: [
           {
             type: "tab",
-            name: "Two",
-            component: "button",
+            name: "Assets",
+            component: "assets-panel",
           },
         ],
       },
@@ -43,8 +43,8 @@ function App() {
     switch (node.getComponent()) {
       case "scene-renderer":
         return <SceneRenderer />;
-      case "button":
-        return <button>{node.getName()}</button>;
+      case "assets-panel":
+        return <AssetsPanel />;
       default:
         break;
     }

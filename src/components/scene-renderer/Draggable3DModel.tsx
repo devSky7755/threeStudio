@@ -1,17 +1,23 @@
 import React, { useRef, useState } from "react";
-import { useThree } from "@react-three/fiber";
+import { useLoader, useThree } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
 import { animated, useSpring } from "@react-spring/three";
-import * as THREE from "three";
+import { Vector3 } from "three";
+
+import { loader, getObj } from "../../service/scene-renderer";
 
 const Draggable3DModel = (props: any) => {
-  const planeIntersectPoint = new THREE.Vector3(0, 0, 0);
+  const { setIsDragging, selModel, floorPlane } = props;
 
   const ref = useRef();
-  const [position, setPosition] = useState([0, 1, 0]);
+  const [position, setPosition] = useState([0, 0, 0]);
   const { size, viewport } = useThree();
-  const aspect = size.width / viewport.width;
 
+  const loadedModel: any = useLoader(
+    loader(selModel),
+    "/assets/" + selModel.type + "/" + selModel.file_name,
+    () => {}
+  );
   const [spring, api] = useSpring(() => ({
     position: position,
     scale: 1,
@@ -19,38 +25,21 @@ const Draggable3DModel = (props: any) => {
     config: { friction: 10 },
   }));
 
-  // useFrame(() => {
-  //   const node: any = ref?.current;
-  //   if (node && node?.rotation) {
-  //     node.rotation.x += 0.01;
-  //   }
-  // });
-
-  // const bind = useDrag(
-  //   ({ active, movement: [mx, my], timeStamp, event }) => {
-  //     props.setIsDragging(active);
-  //     const rayEvent: any = event;
-  //     if (active) {
-  //       rayEvent.ray.intersectPlane(props.floorPlane, planeIntersectPoint);
-  //       setPosition([planeIntersectPoint.x, 1.5, planeIntersectPoint.z]);
-  //     }
-  //   },
-  //   { pointerEvents: true }
-  // );
-
+  const planeIntersectPoint = new Vector3(0, 0, 0);
+  const aspect = size.width / viewport.width;
   const bind = useDrag(
     ({ active, movement: [x, y], timeStamp, event }) => {
-      props.setIsDragging(active);
+      setIsDragging(active);
       const rayEvent: any = event;
       if (active) {
-        rayEvent.ray.intersectPlane(props.floorPlane, planeIntersectPoint);
-        setPosition([planeIntersectPoint.x, 1.5, planeIntersectPoint.z]);
+        rayEvent.ray.intersectPlane(floorPlane, planeIntersectPoint);
+        setPosition([planeIntersectPoint.x, 0, planeIntersectPoint.z]);
       }
 
       api.start({
         position: position,
         scale: active ? 1.2 : 1,
-        rotation: [y / aspect, x / aspect, 0],
+        // rotation: [y / aspect, x / aspect, 0],
       });
       return timeStamp;
     },
@@ -58,14 +47,16 @@ const Draggable3DModel = (props: any) => {
   );
 
   return (
-    <animated.mesh {...props} {...spring} {...bind()} ref={ref}>
-      <dodecahedronGeometry attach="geometry" args={[1.4, 0]} />
-      <meshLambertMaterial attach="material" color="hotpink" />
-    </animated.mesh>
-    // <mesh {...props} position={position} {...bind()} ref={ref}>
-    //   <dodecahedronBufferGeometry attach="geometry" />
-    //   <meshLambertMaterial attach="material" color="hotpink" />
-    // </mesh>
+    <animated.group
+      ref={ref}
+      {...props}
+      {...spring}
+      {...bind()}
+      castShadow
+      receiveShadow
+    >
+      <primitive object={getObj(selModel, loadedModel)} scale={0.5} />
+    </animated.group>
   );
 };
 
