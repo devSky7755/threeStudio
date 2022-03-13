@@ -33,7 +33,7 @@ const Draggable3DModel = (props: any) => {
       const rayEvent: any = event;
       if (active) {
         rayEvent.ray.intersectPlane(floorPlane, planeIntersectPoint);
-        setPosition([planeIntersectPoint.x, 0, planeIntersectPoint.z]);
+        setPosition([planeIntersectPoint.x, planeIntersectPoint.y, 0]);
       }
 
       api.start({

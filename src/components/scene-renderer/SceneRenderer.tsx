@@ -13,7 +13,7 @@ const SceneRenderer = () => {
   const [isDragging, setIsDragging] = useState(false);
   const selModel = useSelector((state: any) => state.model);
 
-  const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  const floorPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
   return (
     <div className="canvas-container">
       <Canvas className="canvas" camera={{ position: [8, 8, 8] }}>
@@ -37,8 +37,6 @@ const SceneRenderer = () => {
 
         <planeHelper args={[floorPlane, 5, 0xddeee]} />
         <primitive object={new THREE.AxesHelper(10)} />
-        <gridHelper args={[100, 100, 0x888888]} />
-        <gridHelper args={[100, 4, 0x222222]} />
         <OrbitControls minZoom={10} maxZoom={50} enabled={!isDragging} />
       </Canvas>
     </div>
