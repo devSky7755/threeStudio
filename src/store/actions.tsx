@@ -1,2 +1,2 @@
 // action - select gltf from asset panel
-export const SET_MODEL = "@model/SET_MODEL";
+export const ADD_MODEL = "@model/ADD_MODEL";

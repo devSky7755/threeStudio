@@ -18,11 +18,11 @@ export const loader = (selModel: any): any => {
 export const getObj = (selModel: any, loadedModel: any) => {
   switch (selModel.type) {
     case "gltf":
-      return loadedModel.scene;
+      return loadedModel.scene.clone(true);
     case "obj":
     case "fbx":
-      return loadedModel;
+      return loadedModel.clone(true);
     default:
-      return loadedModel;
+      return loadedModel.clone(true);
   }
 };

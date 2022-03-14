@@ -1,70 +1,77 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { Fragment } from "react";
+import styled from "styled-components";
+import { Droppable, Draggable } from "react-beautiful-dnd";
 import { GLTF as MOCK_GLTF } from "../../provider/mock";
 import { OBJ as MOCK_OBJ } from "../../provider/mock";
 
-import {
-  Box,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
-} from "@mui/material";
+interface DraggingProps {
+  isDragging?: boolean;
+}
 
-import { SET_MODEL } from "../../store/actions";
+const Item = styled.div<DraggingProps>`
+  display: flex;
+  user-select: none;
+  padding: 0.5rem;
+  margin: 0 0 0.5rem 0;
+  align-items: flex-start;
+  align-content: flex-start;
+  line-height: 1.5;
+  border-radius: 3px;
+  background: #fff;
+  border: 1px
+    ${(props: any) => (props.isDragging ? "dashed #4099ff" : "solid #ddd")};
+`;
 
-const AssetsPanel = () => {
-  const dispatch = useDispatch();
-  const selModel = useSelector((state: any) => state.model);
-  const [value, setValue] = useState(selModel.file_name);
+const List = styled.div`
+  border: 1px solid #ddd;
+  padding: 0.5rem 0.5rem 0;
+  border-radius: 3px;
+  font-family: sans-serif;
+`;
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = (event.target as HTMLInputElement).value;
-    setValue(newValue);
+const Kiosk = styled(List)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+`;
 
-    const ext = newValue.split(".").pop();
-    dispatch({
-      type: SET_MODEL,
-      payload: {
-        file_name: newValue,
-        type: ext,
-      },
-    });
-  };
-
-  const gltfNames = MOCK_GLTF.file_names;
-  const objNames = MOCK_OBJ.file_names;
+const AssetsPanel = (props: any) => {
+  const gltfs = MOCK_GLTF.files;
+  const objs = MOCK_OBJ.files;
+  const mergedFiles = [...gltfs, ...objs];
 
   return (
-    <Box component="div" sx={{ p: 2 }}>
-      <FormControl className={"p-1"} margin="normal" fullWidth>
-        <FormLabel id="assets-radio-group-label">Select Assets</FormLabel>
-        <RadioGroup
-          aria-labelledby="assets-radio-group-label"
-          name="radio-buttons-group"
-          value={value}
-          onChange={handleChange}
-        >
-          {gltfNames.map((name, i) => (
-            <FormControlLabel
-              value={name}
-              control={<Radio />}
-              label={name}
-              key={i}
-            />
+    <Droppable droppableId="ITEMS" isDropDisabled={true}>
+      {(provided, snapshot) => (
+        <Kiosk ref={provided.innerRef} {...provided.droppableProps}>
+          {mergedFiles.map((item: any, index: number) => (
+            <Draggable draggableId={item.id} index={index} key={item.id}>
+              {(provided, snapshot) => (
+                <Fragment>
+                  <Item
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    isDragging={snapshot.isDragging}
+                    style={provided.draggableProps.style}
+                  >
+                    {item.name}
+                  </Item>
+                  {snapshot.isDragging && (
+                    <>
+                      <Item>{item.name}</Item>
+                    </>
+                  )}
+                </Fragment>
+              )}
+            </Draggable>
           ))}
-          {objNames.map((name, i) => (
-            <FormControlLabel
-              value={name}
-              control={<Radio />}
-              label={name}
-              key={i}
-            />
-          ))}
-        </RadioGroup>
-      </FormControl>
-    </Box>
+          {provided.placeholder}
+        </Kiosk>
+      )}
+    </Droppable>
   );
 };
 

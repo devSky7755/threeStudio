@@ -1,12 +1,31 @@
+import { v4 as uuid } from "uuid";
+
 export const GLTF = {
-  file_names: [
-    "AlphaBlendModeTest.gltf",
-    "Box.gltf",
-    "Buggy.gltf",
-    "Poimandres.gltf",
+  files: [
+    {
+      id: uuid(),
+      name: "AlphaBlendModeTest.gltf",
+    },
+    {
+      id: uuid(),
+      name: "Box.gltf",
+    },
+    {
+      id: uuid(),
+      name: "Buggy.gltf",
+    },
+    {
+      id: uuid(),
+      name: "Poimandres.gltf",
+    },
   ],
 };
 
 export const OBJ = {
-  file_names: ["Poimandres.obj"],
+  files: [
+    {
+      id: uuid(),
+      name: "Poimandres.obj",
+    },
+  ],
 };

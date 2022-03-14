@@ -1,21 +1,21 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLoader, useThree } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
 import { animated, useSpring } from "@react-spring/three";
-import { Vector3 } from "three";
+import { Raycaster, Vector3 } from "three";
 
 import { loader, getObj } from "../../service/scene-renderer";
 
 const Draggable3DModel = (props: any) => {
-  const { setIsDragging, selModel, floorPlane } = props;
-
+  const { setIsDragging, model, floorPlane } = props;
   const ref = useRef();
   const [position, setPosition] = useState([0, 0, 0]);
-  const { size, viewport } = useThree();
+  const { gl, mouse, camera, size, viewport } = useThree();
 
+  const aspect = size.width / viewport.width;
   const loadedModel: any = useLoader(
-    loader(selModel),
-    "/assets/" + selModel.type + "/" + selModel.file_name,
+    loader(model),
+    "/assets/" + model.type + "/" + model.file_name,
     () => {}
   );
   const [spring, api] = useSpring(() => ({
@@ -26,7 +26,24 @@ const Draggable3DModel = (props: any) => {
   }));
 
   const planeIntersectPoint = new Vector3(0, 0, 0);
-  const aspect = size.width / viewport.width;
+
+  useEffect(() => {
+    if (model.position) {
+      var raycaster = new Raycaster();
+      mouse.set(
+        (model.position.x / gl.domElement.clientWidth) * 2 - 1,
+        -(model.position.y / gl.domElement.clientHeight) * 2 + 1
+      );
+
+      raycaster.setFromCamera(mouse, camera);
+      raycaster.ray.intersectPlane(floorPlane, planeIntersectPoint);
+      setPosition([planeIntersectPoint.x, planeIntersectPoint.y, 0]);
+      api.start({
+        position: [planeIntersectPoint.x, planeIntersectPoint.y, 0],
+      });
+    }
+  }, [model.position]);
+
   const bind = useDrag(
     ({ active, movement: [x, y], timeStamp, event }) => {
       setIsDragging(active);
@@ -55,7 +72,7 @@ const Draggable3DModel = (props: any) => {
       castShadow
       receiveShadow
     >
-      <primitive object={getObj(selModel, loadedModel)} scale={0.5} />
+      <primitive object={getObj(model, loadedModel)} scale={0.5} />
     </animated.group>
   );
 };
