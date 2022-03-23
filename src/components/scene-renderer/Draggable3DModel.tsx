@@ -7,51 +7,24 @@ import React, {
 } from "react";
 import { useLoader, useThree } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
-import { Box, Sphere } from "@react-three/drei";
 import { animated, useSpring } from "@react-spring/three";
-import {
-  Raycaster,
-  Vector3,
-  BoxBufferGeometry,
-  MeshBasicMaterial,
-  Mesh,
-  Box3,
-  EdgesGeometry,
-  BufferGeometry,
-} from "three";
+import { Raycaster, Vector3, Mesh } from "three";
 
 import { loader, getObj } from "../../service/scene-renderer";
 
-import { EffectComposer, Outline } from "@react-three/postprocessing";
-
 const Draggable3DModel = (props: any) => {
-  const {
-    // index,
-    setIsDragging,
-    model,
-    floorPlane,
-    // selectedObject,
-    // setSelectedObject,
-  } = props;
+  const { setIsDragging, model, color, floorPlane, isSelected, ...rest } =
+    props;
   const ref = useRef<any>();
 
   const [position, setPosition] = useState([0, 0, 0]);
-  const { scene, gl, mouse, camera, size, viewport } = useThree();
+  const { gl, mouse, camera } = useThree();
   const loadedModel: any = useLoader(
     loader(model),
     "/assets/" + model.type + "/" + model.file_name
   );
   const obj = getObj(model, loadedModel);
-  // console.log(obj);
-  // const box = useMemo(() => new Box3().setFromObject(obj), [obj]);
-  // const edges = useMemo(
-  //   () => new EdgesGeometry(obj.children.slice(-1)[0].geometry),
-  //   undefined
-  // );
-  // console.log(obj.children.slice(-1)[0].geometry);
-  const [edges, setEdges] = useState<BufferGeometry>();
 
-  const aspect = size.width / viewport.width;
   const [spring, api] = useSpring(() => ({
     position: position,
     scale: 1,
@@ -61,8 +34,6 @@ const Draggable3DModel = (props: any) => {
   }));
 
   const planeIntersectPoint = new Vector3(0, 0, 0);
-
-  // const selected = [ref];
 
   useEffect(() => {
     if (model.position) {
@@ -82,16 +53,19 @@ const Draggable3DModel = (props: any) => {
     }
   }, [model.position]);
 
-  // useLayoutEffect(() => {
-  //   if (ref) {
-  //     // ref.current.traverse(function (mesh: any) {
-  //     //   if (mesh instanceof Mesh) {
-  //     //     setEdges(mesh.geometry);
-  //     //   }
-  //     // });
-  //     setSelectedObject(ref);
-  //   }
-  // }, []);
+  useEffect(() => {
+    setObjectColor(color);
+  }, [color]);
+
+  const setObjectColor = (color: string) => {
+    if (ref && color) {
+      ref.current.traverse(function (mesh: any) {
+        if (mesh instanceof Mesh) {
+          mesh.material.color.set(color);
+        }
+      });
+    }
+  };
 
   const bind = useDrag(
     ({ active, movement: [x, y], timeStamp, event }) => {
@@ -111,30 +85,23 @@ const Draggable3DModel = (props: any) => {
     { delay: true }
   );
 
-  // var hitGeom = new BoxBufferGeometry(1, 1, 1);
-  // var hitMat = new MeshBasicMaterial({ visible: true });
+  const onClick = (event: React.PointerEvent<HTMLElement>) => {
+    // event.stopPropagation();
+    // console.log(event, "down");
+  };
 
   return (
     <animated.group
-      {...props}
+      onClick={onClick}
+      {...rest}
       {...spring}
       {...bind()}
       castShadow
       receiveShadow
-      // onClick={(e: any) => {
-      //   selectedObject == ref
-      //     ? setSelectedObject(null)
-      //     : setSelectedObject(ref);
-      //   e.stopPropagation();
-      // }}
+      ref={ref}
     >
-      <primitive object={obj} scale={0.5} ref={ref} />
-      {/* <mesh geometry={hitGeom} material={hitMat} ref={ref} /> */}
-      {/* <lineSegments geometry={edges} renderOrder={100} scale={0.5}>
-          <lineBasicMaterial color="black" />
-        </lineSegments> */}
+      <primitive object={obj} scale={0.1} />
     </animated.group>
-    // { <boxHelper args={[ref, 0xff0000]}></boxHelper> }
   );
 };
 

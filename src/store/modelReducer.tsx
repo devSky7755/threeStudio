@@ -1,11 +1,22 @@
 // action - state management
 import { GLTF as MOCK_GLTF } from "../provider/mock";
 import * as actionTypes from "./actions";
+import { v4 as uuid } from "uuid";
 
-export const initialState = {
-  file_name: null,
-  type: null,
-  position: null,
+export interface Model {
+  uuid: string | null;
+  file_name: string | null;
+  type: string | null;
+  position: any | null;
+  color: string;
+}
+
+export const initialState: {
+  selModel: string | null;
+  models: Model[];
+} = {
+  selModel: null,
+  models: [],
 };
 
 // ==============================|| MODEL REDUCER ||============================== //
@@ -13,11 +24,33 @@ export const initialState = {
 const modelReducer = (state = initialState, action: any) => {
   switch (action.type) {
     case actionTypes.ADD_MODEL:
+      if (action.payload?.position && action.payload?.file_name) {
+        const newModel = {
+          uuid: uuid(),
+          file_name: action.payload?.file_name,
+          type: action.payload?.type,
+          position: action.payload?.position,
+          color: "#ffffff",
+        };
+        const models = [...state.models, newModel];
+        const selModel = newModel.uuid;
+        return {
+          ...state,
+          models,
+          selModel,
+        };
+      } else return state;
+    case actionTypes.SET_MODEL_COLOR:
+      if (!state.selModel) return;
+      const models = state.models.map((model) => {
+        if (model.uuid === state.selModel) {
+          model.color = action.payload?.color;
+        }
+        return model;
+      });
       return {
         ...state,
-        file_name: action.payload?.file_name,
-        type: action.payload?.type,
-        position: action.payload?.position,
+        models,
       };
     default:
       return state;

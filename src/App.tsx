@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 
 import "./App.css";
 import { AssetsPanel } from "./components/assets-panel";
+import { EditorPanel } from "./components/editor-panel";
 import SceneRenderer from "./components/scene-renderer/SceneRenderer";
 import { ADD_MODEL } from "./store/actions";
 import { GLTF as MOCK_GLTF } from "./provider/mock";
@@ -30,13 +31,30 @@ const configLayout: IJsonModel = {
         ],
       },
       {
-        type: "tabset",
+        type: "row",
         weight: 30,
         children: [
           {
-            type: "tab",
-            name: "Assets",
-            component: "assets-panel",
+            type: "tabset",
+            weight: 50,
+            children: [
+              {
+                type: "tab",
+                name: "Assets",
+                component: "assets-panel",
+              },
+            ],
+          },
+          {
+            type: "tabset",
+            weight: 50,
+            children: [
+              {
+                type: "tab",
+                name: "Editor",
+                component: "editor-panel",
+              },
+            ],
           },
         ],
       },
@@ -57,6 +75,8 @@ function App() {
         return <SceneRenderer />;
       case "assets-panel":
         return <AssetsPanel />;
+      case "editor-panel":
+        return <EditorPanel />;
       default:
         break;
     }

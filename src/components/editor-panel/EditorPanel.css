@@ -1,0 +1,4 @@
+.popover_class .MuiPaper-root {
+  overflow: inherit !important;
+  border-radius: 8px !important;
+}
