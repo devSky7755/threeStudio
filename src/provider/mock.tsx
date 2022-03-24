@@ -21,6 +21,15 @@ export const GLTF = {
   ],
 };
 
+export const GLB = {
+  files: [
+    {
+      id: uuid(),
+      name: "cat.glb",
+    },
+  ],
+};
+
 export const OBJ = {
   files: [
     {

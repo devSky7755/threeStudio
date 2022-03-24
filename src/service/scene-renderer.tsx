@@ -5,6 +5,7 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 export const loader = (selModel: any): any => {
   switch (selModel.type) {
     case "gltf":
+    case "glb":
       return GLTFLoader;
     case "obj":
       return OBJLoader;
@@ -18,6 +19,7 @@ export const loader = (selModel: any): any => {
 export const getObj = (selModel: any, loadedModel: any) => {
   switch (selModel.type) {
     case "gltf":
+    case "glb":
       return loadedModel.scene.clone(true);
     case "obj":
     case "fbx":

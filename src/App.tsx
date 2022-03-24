@@ -10,6 +10,7 @@ import { EditorPanel } from "./components/editor-panel";
 import SceneRenderer from "./components/scene-renderer/SceneRenderer";
 import { ADD_MODEL } from "./store/actions";
 import { GLTF as MOCK_GLTF } from "./provider/mock";
+import { GLB as MOCK_GLB } from "./provider/mock";
 import { OBJ as MOCK_OBJ } from "./provider/mock";
 
 const configLayout: IJsonModel = {
@@ -67,6 +68,7 @@ function App() {
   const [event, setEvent] = useState<any>();
   const dispatch = useDispatch();
   const gltfs = MOCK_GLTF.files;
+  const glbs = MOCK_GLB.files;
   const objs = MOCK_OBJ.files;
 
   const factory = (node: TabNode) => {
@@ -92,7 +94,7 @@ function App() {
 
   const onDragEnd = (result: any) => {
     if (result.destination?.droppableId === "CANVAS") {
-      const selValue = [...gltfs, ...objs].find((file) => {
+      const selValue = [...gltfs, ...glbs, ...objs].find((file) => {
         return file.id === result.draggableId;
       });
       if (selValue) {

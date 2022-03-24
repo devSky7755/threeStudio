@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import styled from "styled-components";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import { GLTF as MOCK_GLTF } from "../../provider/mock";
+import { GLB as MOCK_GLB } from "../../provider/mock";
 import { OBJ as MOCK_OBJ } from "../../provider/mock";
 import DeleteIcon from "@mui/icons-material/Delete";
 import cubeIcon from "./../../assets/icons/cube-1.png";
@@ -61,7 +62,8 @@ MyIcon.defaultProps = {
 const AssetsPanel = (props: any) => {
   const gltfs = MOCK_GLTF.files;
   const objs = MOCK_OBJ.files;
-  const mergedFiles = [...gltfs, ...objs];
+  const glbs = MOCK_GLB.files;
+  const mergedFiles = [...gltfs, ...glbs, ...objs];
 
   const getStyle = (style: any, snapshot: any) => {
     if (!snapshot.isDragging) return {};

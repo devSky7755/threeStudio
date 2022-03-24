@@ -1,20 +1,42 @@
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import React, { Suspense, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Environment, Stars, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-import Draggable3DModel from "./Draggable3DModel";
-import Plane from "./Plane";
+import { useDispatch, useSelector } from "react-redux";
 
 import "./SceneRenderer.css";
-import { useSelector } from "react-redux";
+
+import Draggable3DModel from "./Draggable3DModel";
+import Plane from "./Plane";
 import { Droppable } from "react-beautiful-dnd";
 import { Model } from "../../store/modelReducer";
+import { DESELECT_MODEL, SELECT_MODEL } from "../../store/actions";
 
 const SceneRenderer = () => {
   const [isDragging, setIsDragging] = useState(false);
   const modelRedx = useSelector((state: any) => state.model);
+  const dispatch = useDispatch();
 
   const floorPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+
+  const onSelectedModel = (uuid: string) => {
+    dispatch({
+      type: SELECT_MODEL,
+      payload: {
+        selected: uuid,
+      },
+    });
+  };
+
+  const intersectionsFilter = (intersections: any) => {
+    return intersections;
+  };
+
+  const onPointerMissed = (event: any) => {
+    dispatch({
+      type: DESELECT_MODEL,
+    });
+  };
 
   return (
     <Droppable droppableId="CANVAS">
@@ -24,27 +46,33 @@ const SceneRenderer = () => {
           ref={provided.innerRef}
           {...provided.droppableProps}
         >
-          <Canvas className="canvas" /*camera={{ position: [8, 8, 8] }}*/>
+          <Canvas
+            className="canvas"
+            /*camera={{ position: [8, 8, 8] }}*/
+            /* raycaster={{ filter: intersectionsFilter }} */
+          >
             {/* <Stars /> */}
             <ambientLight />
             <spotLight intensity={1} position={[5, 20, 20]} />
 
-            {modelRedx.models.map((model: Model, index: number) => {
-              return (
-                <Suspense fallback={null} key={index}>
-                  <Draggable3DModel
-                    key={"model" + index}
-                    setIsDragging={setIsDragging}
-                    model={model}
-                    color={model.color}
-                    floorPlane={floorPlane}
-                    isSelected={model.uuid === modelRedx.selModel}
-                  />
-                  {/* <Environment preset="sunset" background /> */}
-                </Suspense>
-              );
-            })}
-
+            <group dispose={null} onPointerMissed={onPointerMissed}>
+              {modelRedx.models.map((model: Model, index: number) => {
+                return (
+                  <Suspense fallback={null} key={index}>
+                    <Draggable3DModel
+                      key={"model" + index}
+                      setIsDragging={setIsDragging}
+                      model={model}
+                      color={model.color}
+                      floorPlane={floorPlane}
+                      onSelectedModel={onSelectedModel}
+                    />
+                    {/* <Environment preset="sunset" background /> */}
+                    {/* <Environment files="/assets/royal_esplanade_1k.hdr" /> */}
+                  </Suspense>
+                );
+              })}
+            </group>
             {/* <Plane /> */}
             {/* <planeHelper args={[floorPlane, 5, 0xddeee]} /> */}
             <primitive object={new THREE.AxesHelper(10)} />

@@ -1,19 +1,14 @@
-import React, {
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useLoader, useThree } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
 import { animated, useSpring } from "@react-spring/three";
 import { Raycaster, Vector3, Mesh } from "three";
+import debounce from "lodash/debounce";
 
 import { loader, getObj } from "../../service/scene-renderer";
 
 const Draggable3DModel = (props: any) => {
-  const { setIsDragging, model, color, floorPlane, isSelected, ...rest } =
+  const { setIsDragging, model, color, floorPlane, onSelectedModel, ...rest } =
     props;
   const ref = useRef<any>();
 
@@ -74,6 +69,7 @@ const Draggable3DModel = (props: any) => {
       if (active) {
         rayEvent.ray.intersectPlane(floorPlane, planeIntersectPoint);
         setPosition([planeIntersectPoint.x, planeIntersectPoint.y, 0]);
+        debounceEmitOnSelect(model.uuid);
       }
 
       api.start({
@@ -85,9 +81,15 @@ const Draggable3DModel = (props: any) => {
     { delay: true }
   );
 
+  const debounceEmitOnSelect = useCallback(
+    debounce((uuid: string) => {
+      onSelectedModel(uuid);
+    }, 300),
+    []
+  );
+
   const onClick = (event: React.PointerEvent<HTMLElement>) => {
-    // event.stopPropagation();
-    // console.log(event, "down");
+    debounceEmitOnSelect(model.uuid);
   };
 
   return (
