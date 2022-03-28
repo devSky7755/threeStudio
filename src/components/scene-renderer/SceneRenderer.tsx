@@ -10,7 +10,11 @@ import Draggable3DModel from "./Draggable3DModel";
 import Plane from "./Plane";
 import { Droppable } from "react-beautiful-dnd";
 import { Model } from "../../store/modelReducer";
-import { DESELECT_MODEL, SELECT_MODEL } from "../../store/actions";
+import {
+  DESELECT_MODEL,
+  SELECT_MODEL,
+  UPDATE_MODEL,
+} from "../../store/actions";
 
 const SceneRenderer = () => {
   const [isDragging, setIsDragging] = useState(false);
@@ -35,6 +39,15 @@ const SceneRenderer = () => {
   const onPointerMissed = (event: any) => {
     dispatch({
       type: DESELECT_MODEL,
+    });
+  };
+
+  const updateModel = (model: Model) => {
+    dispatch({
+      type: UPDATE_MODEL,
+      payload: {
+        model,
+      },
     });
   };
 
@@ -66,6 +79,7 @@ const SceneRenderer = () => {
                       color={model.color}
                       floorPlane={floorPlane}
                       onSelectedModel={onSelectedModel}
+                      updateModel={updateModel}
                     />
                     {/* <Environment preset="sunset" background /> */}
                     {/* <Environment files="/assets/royal_esplanade_1k.hdr" /> */}

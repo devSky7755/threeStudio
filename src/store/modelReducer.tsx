@@ -7,7 +7,7 @@ export interface Model {
   file_name: string | null;
   type: string | null;
   position: any | null;
-  color: string;
+  color: string | null;
 }
 
 export const initialState: {
@@ -29,7 +29,7 @@ const modelReducer = (state = initialState, action: any) => {
           file_name: action.payload?.file_name,
           type: action.payload?.type,
           position: action.payload?.position,
-          color: "#ffffff",
+          color: null,
         };
         const models = [...state.models, newModel];
         const selModel = newModel.uuid;
@@ -66,6 +66,28 @@ const modelReducer = (state = initialState, action: any) => {
       return {
         ...state,
         models,
+      };
+
+    case actionTypes.UPDATE_MODEL:
+      const nModels = state.models.map((model) => {
+        if (model.uuid === action.payload?.model?.uuid) {
+          return { ...action.payload?.model };
+        }
+        return model;
+      });
+      return {
+        ...state,
+        models: nModels,
+      };
+
+    case actionTypes.DELETE_SEL_MODEL:
+      const dModels = state.models.filter((model) => {
+        return model.uuid !== state.selModel;
+      });
+      return {
+        ...state,
+        selModel: null,
+        models: dModels,
       };
 
     default:

@@ -7,13 +7,29 @@ import debounce from "lodash/debounce";
 
 import { loader, getObj } from "../../service/scene-renderer";
 
+interface OrgColors {
+  initiated: boolean;
+  values: any[];
+}
+
 const Draggable3DModel = (props: any) => {
-  const { setIsDragging, model, color, floorPlane, onSelectedModel, ...rest } =
-    props;
+  const {
+    setIsDragging,
+    model,
+    color,
+    floorPlane,
+    onSelectedModel,
+    updateModel,
+    ...rest
+  } = props;
   const ref = useRef<any>();
 
   const [position, setPosition] = useState([0, 0, 0]);
   const [firstPos, setFirstPos] = useState<any>(model.position);
+  const [originColors, setOrgColors] = useState<OrgColors>({
+    initiated: false,
+    values: [],
+  });
 
   const { gl, mouse, camera } = useThree();
   const loadedModel: any = useLoader(
@@ -42,13 +58,47 @@ const Draggable3DModel = (props: any) => {
     setObjectColor(color);
   }, [color]);
 
+  const initiateOrgColors = () => {
+    const values: any = [];
+    let index = 0;
+    ref.current.traverse(function (mesh: any) {
+      if (mesh instanceof Mesh) {
+        values.push({
+          index,
+          color: mesh.material.color.getHexString(),
+        });
+        index++;
+      }
+    });
+    setOrgColors({
+      initiated: true,
+      values,
+    });
+  };
+
   const setObjectColor = (color: string) => {
-    if (ref && color) {
-      ref.current.traverse(function (mesh: any) {
-        if (mesh instanceof Mesh) {
-          mesh.material.color.set(color);
+    if (ref) {
+      if (color) {
+        if (!originColors.initiated) {
+          initiateOrgColors();
         }
-      });
+        ref.current.traverse(function (mesh: any) {
+          if (mesh instanceof Mesh) {
+            mesh.material.color.set(color);
+          }
+        });
+      } else {
+        let index = 0;
+        ref.current.traverse(function (mesh: any) {
+          if (mesh instanceof Mesh) {
+            const meshColor = originColors.values.find(
+              (val) => val.index === index
+            )?.color;
+            meshColor && mesh.material.color.set("#" + meshColor);
+            index++;
+          }
+        });
+      }
     }
   };
 
@@ -80,6 +130,7 @@ const Draggable3DModel = (props: any) => {
       const calcPos = cacluate3DPosFrom2DPos(newPos);
       if (!active) {
         setFirstPos(newPos);
+        updateModel({ ...model, position: newPos });
       }
       moveToNewPos(calcPos);
       debounceEmitOnSelect(model.uuid);

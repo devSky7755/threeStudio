@@ -4,7 +4,9 @@ import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import Input from "@mui/material/Input";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ColorLensIcon from "@mui/icons-material/ColorLens";
+import SettingsBackupRestoreIcon from "@mui/icons-material/SettingsBackupRestore";
 import Popover from "@mui/material/Popover";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
@@ -14,7 +16,7 @@ import { useSelector, useDispatch } from "react-redux";
 import debounce from "lodash/debounce";
 
 import "./EditorPanel.css";
-import { SET_MODEL_COLOR } from "../../store/actions";
+import { DELETE_SEL_MODEL, SET_MODEL_COLOR } from "../../store/actions";
 import { Model } from "../../store/modelReducer";
 
 const Item = styled(Typography)(({ theme }) => ({
@@ -31,7 +33,7 @@ const EditorPanel = (props: any) => {
   const dispatch = useDispatch();
 
   const debounceDispatchColor = useCallback(
-    debounce((color: string) => {
+    debounce((color: string | null) => {
       dispatch({
         type: SET_MODEL_COLOR,
         payload: {
@@ -64,8 +66,18 @@ const EditorPanel = (props: any) => {
     setAnchorEl(event.currentTarget);
   };
 
+  const originIcon = (event: React.MouseEvent<HTMLElement>) => {
+    debounceDispatchColor(null);
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const deleteSelModel = (event: React.MouseEvent<HTMLElement>) => {
+    dispatch({
+      type: DELETE_SEL_MODEL,
+    });
   };
 
   const open = Boolean(anchorEl);
@@ -86,7 +98,21 @@ const EditorPanel = (props: any) => {
           <Item>Name</Item>
         </Grid>
         <Grid item xs={9}>
-          <Item>{selModel?.file_name}</Item>
+          <Box
+            component="div"
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              flexWrap: "wrap",
+            }}
+          >
+            <Item>{selModel?.file_name}</Item>
+            {selModel && (
+              <IconButton aria-label="remove object" onClick={deleteSelModel}>
+                <DeleteOutlineIcon color="error" />
+              </IconButton>
+            )}
+          </Box>
         </Grid>
         <Grid item xs={3}>
           <Item>UUID</Item>
@@ -102,7 +128,7 @@ const EditorPanel = (props: any) => {
             <Grid item xs={9}>
               <Input
                 id="adornment-color"
-                value={color}
+                value={color || ""}
                 onChange={handleChange}
                 fullWidth
                 sx={{ px: 1 }}
@@ -115,6 +141,14 @@ const EditorPanel = (props: any) => {
                       edge="end"
                     >
                       <ColorLensIcon />
+                    </IconButton>
+                    <IconButton
+                      aria-label="open color picker"
+                      onClick={originIcon}
+                      aria-describedby={id}
+                      edge="end"
+                    >
+                      <SettingsBackupRestoreIcon />
                     </IconButton>
                   </InputAdornment>
                 }
@@ -130,7 +164,10 @@ const EditorPanel = (props: any) => {
         onClose={handleClose}
         className="popover_class"
       >
-        <HexColorPicker color={color} onChange={(value) => setColor(value)} />
+        <HexColorPicker
+          color={color || "#ffffff"}
+          onChange={(value) => setColor(value)}
+        />
       </Popover>
     </Box>
   );
