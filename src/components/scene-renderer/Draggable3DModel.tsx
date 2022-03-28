@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useLoader, useThree } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
 import { animated, useSpring } from "@react-spring/three";
-import { Raycaster, Vector3, Mesh } from "three";
+import { Raycaster, Vector3, Mesh, Vector2 } from "three";
 import debounce from "lodash/debounce";
 
 import { loader, getObj } from "../../service/scene-renderer";
@@ -13,6 +13,8 @@ const Draggable3DModel = (props: any) => {
   const ref = useRef<any>();
 
   const [position, setPosition] = useState([0, 0, 0]);
+  const [firstPos, setFirstPos] = useState<any>(model.position);
+
   const { gl, mouse, camera } = useThree();
   const loadedModel: any = useLoader(
     loader(model),
@@ -28,23 +30,11 @@ const Draggable3DModel = (props: any) => {
     immediate: true,
   }));
 
-  const planeIntersectPoint = new Vector3(0, 0, 0);
-
   useEffect(() => {
     if (model.position) {
-      var raycaster = new Raycaster();
-      mouse.set(
-        (model.position.x / gl.domElement.clientWidth) * 2 - 1,
-        -(model.position.y / gl.domElement.clientHeight) * 2 + 1
-      );
-
-      raycaster.setFromCamera(mouse, camera);
-      raycaster.ray.intersectPlane(floorPlane, planeIntersectPoint);
-      setPosition([planeIntersectPoint.x, planeIntersectPoint.y, 0]);
-      api.start({
-        position: [planeIntersectPoint.x, planeIntersectPoint.y, 0],
-        immediate: true,
-      });
+      setFirstPos(model.position);
+      const calcPos = cacluate3DPosFrom2DPos(model.position);
+      moveToNewPos(calcPos);
     }
   }, [model.position]);
 
@@ -62,20 +52,37 @@ const Draggable3DModel = (props: any) => {
     }
   };
 
+  const cacluate3DPosFrom2DPos = (pos: any): number[] => {
+    const planeIntersectPoint = new Vector3(0, 0, 0);
+    var raycaster = new Raycaster();
+    mouse.set(
+      (pos.x / gl.domElement.clientWidth) * 2 - 1,
+      -(pos.y / gl.domElement.clientHeight) * 2 + 1
+    );
+    raycaster.setFromCamera(mouse, camera);
+    raycaster.ray.intersectPlane(floorPlane, planeIntersectPoint);
+    return [planeIntersectPoint.x, planeIntersectPoint.y, 0];
+  };
+
+  const moveToNewPos = (threeDPos: any) => {
+    setPosition(threeDPos);
+    api.start({
+      position: threeDPos,
+      immediate: true,
+    });
+  };
+
   const bind = useDrag(
     ({ active, movement: [x, y], timeStamp, event }) => {
+      if (!firstPos) return;
       setIsDragging(active);
-      const rayEvent: any = event;
-      if (active) {
-        rayEvent.ray.intersectPlane(floorPlane, planeIntersectPoint);
-        setPosition([planeIntersectPoint.x, planeIntersectPoint.y, 0]);
-        debounceEmitOnSelect(model.uuid);
+      const newPos = { x: firstPos?.x + x, y: firstPos?.y + y };
+      const calcPos = cacluate3DPosFrom2DPos(newPos);
+      if (!active) {
+        setFirstPos(newPos);
       }
-
-      api.start({
-        position: position,
-        immediate: true,
-      });
+      moveToNewPos(calcPos);
+      debounceEmitOnSelect(model.uuid);
       return timeStamp;
     },
     { delay: true }
