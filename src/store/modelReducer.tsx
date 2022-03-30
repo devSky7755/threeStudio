@@ -8,6 +8,7 @@ export interface Model {
   type: string | null;
   position: any | null;
   color: string | null;
+  useJSX?: boolean | null;
 }
 
 export const initialState: {
@@ -30,6 +31,7 @@ const modelReducer = (state = initialState, action: any) => {
           type: action.payload?.type,
           position: action.payload?.position,
           color: null,
+          useJSX: action.payload?.useJSX || false,
         };
         const models = [...state.models, newModel];
         const selModel = newModel.uuid;

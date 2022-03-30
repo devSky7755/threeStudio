@@ -1,4 +1,11 @@
 import { v4 as uuid } from "uuid";
+import CatModel from "../components/scene-renderer/models/CatModel";
+import SoldierModel from "../components/scene-renderer/models/SoldierModel";
+
+export const JSXModelComponents: any = {
+  Soldier: SoldierModel,
+  Cat: CatModel,
+};
 
 export const GLTF = {
   files: [
@@ -25,7 +32,13 @@ export const GLB = {
   files: [
     {
       id: uuid(),
-      name: "cat.glb",
+      name: "Cat.glb",
+      useJSX: true,
+    },
+    {
+      id: uuid(),
+      name: "Soldier.glb",
+      useJSX: true,
     },
   ],
 };

@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import "./App.css";
 import { AssetsPanel } from "./components/assets-panel";
 import { EditorPanel } from "./components/editor-panel";
+import { ControlPanel } from "./components/control-panel";
 import SceneRenderer from "./components/scene-renderer/SceneRenderer";
 import { ADD_MODEL } from "./store/actions";
 import { GLTF as MOCK_GLTF } from "./provider/mock";
@@ -55,6 +56,11 @@ const configLayout: IJsonModel = {
                 name: "Editor",
                 component: "editor-panel",
               },
+              {
+                type: "tab",
+                name: "Controls",
+                component: "control-panel",
+              },
             ],
           },
         ],
@@ -79,6 +85,8 @@ function App() {
         return <AssetsPanel />;
       case "editor-panel":
         return <EditorPanel />;
+      case "control-panel":
+        return <ControlPanel />;
       default:
         break;
     }
@@ -94,7 +102,7 @@ function App() {
 
   const onDragEnd = (result: any) => {
     if (result.destination?.droppableId === "CANVAS") {
-      const selValue = [...gltfs, ...glbs, ...objs].find((file) => {
+      const selValue: any = [...gltfs, ...glbs, ...objs].find((file) => {
         return file.id === result.draggableId;
       });
       if (selValue) {
@@ -108,6 +116,7 @@ function App() {
               x: event?.offsetX,
               y: event?.offsetY,
             },
+            useJSX: selValue?.useJSX || false,
           },
         });
       }

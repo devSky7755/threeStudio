@@ -81,14 +81,10 @@ const SceneRenderer = () => {
                       onSelectedModel={onSelectedModel}
                       updateModel={updateModel}
                     />
-                    {/* <Environment preset="sunset" background /> */}
-                    {/* <Environment files="/assets/royal_esplanade_1k.hdr" /> */}
                   </Suspense>
                 );
               })}
             </group>
-            {/* <Plane /> */}
-            {/* <planeHelper args={[floorPlane, 5, 0xddeee]} /> */}
             <primitive object={new THREE.AxesHelper(10)} />
             <OrbitControls minZoom={10} maxZoom={50} enabled={!isDragging} />
           </Canvas>

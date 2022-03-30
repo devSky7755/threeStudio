@@ -2,15 +2,32 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useLoader, useThree } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
 import { animated, useSpring } from "@react-spring/three";
-import { Raycaster, Vector3, Mesh, Vector2 } from "three";
+import { Raycaster, Vector3, Mesh } from "three";
 import debounce from "lodash/debounce";
 
 import { loader, getObj } from "../../service/scene-renderer";
+import { JSXModelComponents } from "../../provider/mock";
 
 interface OrgColors {
   initiated: boolean;
   values: any[];
 }
+const RenderModel = (props: any) => {
+  const { model, ...rest } = props;
+  const obj = getObj(
+    model,
+    useLoader(loader(model), "/assets/" + model.type + "/" + model.file_name)
+  );
+  const CustomTag =
+    JSXModelComponents[model?.file_name?.replace(/\.[^/.]+$/, "") || "Soldier"];
+
+  return (
+    <>
+      {!model.useJSX && <primitive object={obj} scale={0.1} />}
+      {model.useJSX && <CustomTag></CustomTag>}
+    </>
+  );
+};
 
 const Draggable3DModel = (props: any) => {
   const {
@@ -32,11 +49,6 @@ const Draggable3DModel = (props: any) => {
   });
 
   const { gl, mouse, camera } = useThree();
-  const loadedModel: any = useLoader(
-    loader(model),
-    "/assets/" + model.type + "/" + model.file_name
-  );
-  const obj = getObj(model, loadedModel);
 
   const [spring, api] = useSpring(() => ({
     position: position,
@@ -160,7 +172,7 @@ const Draggable3DModel = (props: any) => {
       receiveShadow
       ref={ref}
     >
-      <primitive object={obj} scale={0.1} />
+      <RenderModel model={model} />
     </animated.group>
   );
 };
