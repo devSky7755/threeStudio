@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -15,6 +15,25 @@ const Item = styled(Typography)(({ theme }) => ({
 }));
 
 const VisibilityAccord = (props: any) => {
+  const { updateModelControl } = props;
+  const [showModel, setShowModel] = useState(true);
+  const [showSkt, setShowSkt] = useState(false);
+
+  const handleShowModelChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setShowModel(event.target.checked);
+  };
+
+  const handleShowSktChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setShowSkt(event.target.checked);
+  };
+
+  useEffect(() => {
+    updateModelControl({
+      show_model: showModel,
+      show_skt: showSkt,
+    });
+  }, [showModel, showSkt]);
+
   return (
     <Accordion defaultExpanded={true} sx={{ p: 0, m: 0 }}>
       <AccordionSummary
@@ -30,13 +49,21 @@ const VisibilityAccord = (props: any) => {
             <Item>show model</Item>
           </Grid>
           <Grid item xs={7}>
-            <Checkbox defaultChecked />
+            <Checkbox
+              checked={showModel}
+              onChange={handleShowModelChange}
+              inputProps={{ "aria-label": "controlled" }}
+            />
           </Grid>
           <Grid item xs={5}>
             <Item>show skeleton</Item>
           </Grid>
           <Grid item xs={7}>
-            <Checkbox defaultChecked />
+            <Checkbox
+              checked={showSkt}
+              onChange={handleShowSktChange}
+              inputProps={{ "aria-label": "controlled" }}
+            />
           </Grid>
         </Grid>
       </AccordionDetails>

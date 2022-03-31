@@ -13,18 +13,29 @@ interface OrgColors {
   values: any[];
 }
 const RenderModel = (props: any) => {
-  const { model, ...rest } = props;
+  const { model, setAnimationExist, ...rest } = props;
   const obj = getObj(
     model,
     useLoader(loader(model), "/assets/" + model.type + "/" + model.file_name)
   );
+
+  useEffect(() => {
+    setAnimationExist(model.useJSX);
+  }, [model.useJSX, setAnimationExist]);
+
   const CustomTag =
     JSXModelComponents[model?.file_name?.replace(/\.[^/.]+$/, "") || "Soldier"];
 
   return (
     <>
-      {!model.useJSX && <primitive object={obj} scale={0.1} />}
-      {model.useJSX && <CustomTag></CustomTag>}
+      {!model.useJSX && <primitive {...rest} object={obj} scale={0.1} />}
+      {model.useJSX && (
+        <CustomTag
+          modelControl={model.control}
+          {...rest}
+          setAnimationExist={setAnimationExist}
+        ></CustomTag>
+      )}
     </>
   );
 };
@@ -40,7 +51,7 @@ const Draggable3DModel = (props: any) => {
     ...rest
   } = props;
   const ref = useRef<any>();
-
+  const [animationExist, setAnimationExist] = useState(false);
   const [position, setPosition] = useState([0, 0, 0]);
   const [firstPos, setFirstPos] = useState<any>(model.position);
   const [originColors, setOrgColors] = useState<OrgColors>({
@@ -69,6 +80,21 @@ const Draggable3DModel = (props: any) => {
   useEffect(() => {
     setObjectColor(color);
   }, [color]);
+
+  useEffect(() => {
+    updateModel({
+      ...model,
+      animation: animationExist,
+      control:
+        animationExist &&
+        (model.control || {
+          show_model: true,
+          show_skt: false,
+          activate_all: true,
+          continue_model: true,
+        }),
+    });
+  }, [animationExist]);
 
   const initiateOrgColors = () => {
     const values: any = [];
@@ -172,7 +198,7 @@ const Draggable3DModel = (props: any) => {
       receiveShadow
       ref={ref}
     >
-      <RenderModel model={model} />
+      <RenderModel model={model} setAnimationExist={setAnimationExist} />
     </animated.group>
   );
 };

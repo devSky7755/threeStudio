@@ -1,13 +1,13 @@
 import React, { Suspense, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Environment, Stars, OrbitControls } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { useDispatch, useSelector } from "react-redux";
 
 import "./SceneRenderer.css";
 
 import Draggable3DModel from "./Draggable3DModel";
-import Plane from "./Plane";
+// import Plane from "./Plane";
 import { Droppable } from "react-beautiful-dnd";
 import { Model } from "../../store/modelReducer";
 import {
@@ -32,10 +32,6 @@ const SceneRenderer = () => {
     });
   };
 
-  const intersectionsFilter = (intersections: any) => {
-    return intersections;
-  };
-
   const onPointerMissed = (event: any) => {
     dispatch({
       type: DESELECT_MODEL,
@@ -53,18 +49,13 @@ const SceneRenderer = () => {
 
   return (
     <Droppable droppableId="CANVAS">
-      {(provided, snapshot) => (
+      {(provided) => (
         <div
           className="canvas-container"
           ref={provided.innerRef}
           {...provided.droppableProps}
         >
-          <Canvas
-            className="canvas"
-            /*camera={{ position: [8, 8, 8] }}*/
-            /* raycaster={{ filter: intersectionsFilter }} */
-          >
-            {/* <Stars /> */}
+          <Canvas className="canvas">
             <ambientLight />
             <spotLight intensity={1} position={[5, 20, 20]} />
 

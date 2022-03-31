@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -22,6 +22,9 @@ const Input = styled(MuiInput)`
 `;
 
 const PusStpAccord = (props: any) => {
+  const { updateModelControl } = props;
+
+  const [continueModel, setContinueModel] = useState(true);
   const [stepSize, setStepSize] = useState<
     number | string | Array<number | string>
   >(0.05);
@@ -45,6 +48,12 @@ const PusStpAccord = (props: any) => {
     }
   };
 
+  useEffect(() => {
+    updateModelControl({
+      continue_model: continueModel,
+    });
+  }, [continueModel]);
+
   return (
     <Accordion defaultExpanded={true} sx={{ p: 0, m: 0 }}>
       <AccordionSummary
@@ -60,7 +69,9 @@ const PusStpAccord = (props: any) => {
           aria-label="vertical outlined button group"
           fullWidth={true}
         >
-          <Button key="pc">pause/continue</Button>
+          <Button key="pc" onClick={() => setContinueModel(!continueModel)}>
+            pause/continue
+          </Button>
           <Button key="mss">make single step</Button>
         </ButtonGroup>
         <Grid container spacing={1}>

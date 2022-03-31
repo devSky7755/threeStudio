@@ -2,6 +2,13 @@
 import * as actionTypes from "./actions";
 import { v4 as uuid } from "uuid";
 
+export interface ModelControl {
+  show_model?: boolean | null;
+  show_skt?: boolean | null;
+  activate_all?: boolean | null;
+  continue_model?: boolean | null;
+}
+
 export interface Model {
   uuid: string | null;
   file_name: string | null;
@@ -9,6 +16,8 @@ export interface Model {
   position: any | null;
   color: string | null;
   useJSX?: boolean | null;
+  animation?: boolean | null;
+  control?: ModelControl | null;
 }
 
 export const initialState: {
@@ -32,6 +41,7 @@ const modelReducer = (state = initialState, action: any) => {
           position: action.payload?.position,
           color: null,
           useJSX: action.payload?.useJSX || false,
+          control: null,
         };
         const models = [...state.models, newModel];
         const selModel = newModel.uuid;

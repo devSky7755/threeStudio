@@ -1,4 +1,3 @@
-// action - select gltf from asset panel
 export const ADD_MODEL = "@model/ADD_MODEL";
 export const SELECT_MODEL = "@model/SELECT_MODEL";
 export const DESELECT_MODEL = "@model/DESELECT_MODEL";
