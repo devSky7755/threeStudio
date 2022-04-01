@@ -1,4 +1,12 @@
-import React, { Suspense, useState } from "react";
+import React, {
+  ElementRef,
+  MutableRefObject,
+  RefObject,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
@@ -21,6 +29,8 @@ const SceneRenderer = () => {
   const modelRedx = useSelector((state: any) => state.model);
   const dispatch = useDispatch();
 
+  // const [childEHCallables, setChildEHCallables] = useState<any>(null); // EH=Event Handler
+
   const floorPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 
   const onSelectedModel = (uuid: string) => {
@@ -36,6 +46,7 @@ const SceneRenderer = () => {
     dispatch({
       type: DESELECT_MODEL,
     });
+    // setChildEHCallables(null);
   };
 
   const updateModel = (model: Model) => {
@@ -46,6 +57,27 @@ const SceneRenderer = () => {
       },
     });
   };
+
+  // const downHandler = ({ key }: { key: string }) => {
+  //   switch (key) {
+  //     case "ArrowLeft":
+  //       childEHCallables && childEHCallables?.doLeftAction();
+  //       break;
+  //     case "ArrowRight":
+  //       childEHCallables && childEHCallables?.doRightAction();
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   document.addEventListener("keydown", downHandler);
+
+  //   return () => {
+  //     document.removeEventListener("keydown", downHandler);
+  //   };
+  // });
 
   return (
     <Droppable droppableId="CANVAS">
@@ -61,6 +93,7 @@ const SceneRenderer = () => {
 
             <group dispose={null} onPointerMissed={onPointerMissed}>
               {modelRedx.models.map((model: Model, index: number) => {
+                const isSelected = modelRedx.selModel == model.uuid;
                 return (
                   <Suspense fallback={null} key={index}>
                     <Draggable3DModel
@@ -69,8 +102,10 @@ const SceneRenderer = () => {
                       model={model}
                       color={model.color}
                       floorPlane={floorPlane}
+                      isSelected={isSelected}
                       onSelectedModel={onSelectedModel}
                       updateModel={updateModel}
+                      // setEHCallables={isSelected && setChildEHCallables}
                     />
                   </Suspense>
                 );

@@ -49,10 +49,10 @@ export default function SoldierModel(props: any) {
   }, [animations, activateAllActions, setAnimationExist]);
 
   useEffect(() => {
-    modelControl.activate_all && activateAllActions();
-    !modelControl.activate_all && deActivateAllActions();
-    modelControl.continue_model && continueModel();
-    !modelControl.continue_model && pauseModel();
+    modelControl?.activate_all && activateAllActions();
+    !modelControl?.activate_all && deActivateAllActions();
+    modelControl?.continue_model && continueModel();
+    !modelControl?.continue_model && pauseModel();
   }, [
     modelControl,
     activateAllActions,

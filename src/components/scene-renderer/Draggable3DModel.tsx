@@ -4,6 +4,7 @@ import { useDrag } from "@use-gesture/react";
 import { animated, useSpring } from "@react-spring/three";
 import { Raycaster, Vector3, Mesh } from "three";
 import debounce from "lodash/debounce";
+import * as THREE from "three";
 
 import { loader, getObj } from "../../service/scene-renderer";
 import { JSXModelComponents } from "../../provider/mock";
@@ -48,6 +49,8 @@ const Draggable3DModel = (props: any) => {
     floorPlane,
     onSelectedModel,
     updateModel,
+    isSelected,
+    // setEHCallables,
     ...rest
   } = props;
   const ref = useRef<any>();
@@ -77,9 +80,55 @@ const Draggable3DModel = (props: any) => {
     }
   }, [model.position]);
 
+  const downHandler = ({ key }: { key: string }) => {
+    switch (key) {
+      case "ArrowLeft":
+        isSelected && doLeftAction();
+        break;
+      case "ArrowRight":
+        isSelected && doRightAction();
+        break;
+      default:
+        break;
+    }
+  };
+
   useEffect(() => {
-    setObjectColor(color);
-  }, [color]);
+    document.addEventListener("keydown", downHandler);
+    return () => {
+      document.removeEventListener("keydown", downHandler);
+    };
+  });
+
+  const doLeftAction = useCallback(() => {
+    updateModel({
+      ...model,
+      position: {
+        x: model.position.x - 3,
+        y: model.position.y,
+      },
+    });
+  }, [position]);
+
+  const doRightAction = useCallback(() => {
+    updateModel({
+      ...model,
+      position: {
+        x: model.position.x + 3,
+        y: model.position.y,
+      },
+    });
+  }, [position]);
+
+  useEffect(() => {
+    isSelected && setObjectColor(color);
+    // isSelected &&
+    //   setEHCallables &&
+    //   setEHCallables({
+    //     doLeftAction,
+    //     doRightAction,
+    //   });
+  }, [color, isSelected /*, setEHCallables, doLeftAction*/]);
 
   useEffect(() => {
     updateModel({
