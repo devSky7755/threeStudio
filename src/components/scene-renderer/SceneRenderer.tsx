@@ -11,6 +11,7 @@ import Draggable3DModel from "./Draggable3DModel";
 import { Droppable } from "react-beautiful-dnd";
 import { Model } from "../../store/modelReducer";
 import {
+  CLEAR_CONTROL_ACTION,
   DESELECT_MODEL,
   SELECT_MODEL,
   UPDATE_MODEL,
@@ -19,9 +20,8 @@ import {
 const SceneRenderer = () => {
   const [isDragging, setIsDragging] = useState(false);
   const modelRedx = useSelector((state: any) => state.model);
+  const controlRedx = useSelector((state: any) => state.control);
   const dispatch = useDispatch();
-
-  // const [childEHCallables, setChildEHCallables] = useState<any>(null); // EH=Event Handler
 
   const floorPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 
@@ -38,7 +38,6 @@ const SceneRenderer = () => {
     dispatch({
       type: DESELECT_MODEL,
     });
-    // setChildEHCallables(null);
   };
 
   const updateModel = (model: Model) => {
@@ -50,26 +49,11 @@ const SceneRenderer = () => {
     });
   };
 
-  // const downHandler = ({ key }: { key: string }) => {
-  //   switch (key) {
-  //     case "ArrowLeft":
-  //       childEHCallables && childEHCallables?.doLeftAction();
-  //       break;
-  //     case "ArrowRight":
-  //       childEHCallables && childEHCallables?.doRightAction();
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   document.addEventListener("keydown", downHandler);
-
-  //   return () => {
-  //     document.removeEventListener("keydown", downHandler);
-  //   };
-  // });
+  const clearControlAction = () => {
+    dispatch({
+      type: CLEAR_CONTROL_ACTION,
+    });
+  };
 
   return (
     <Droppable droppableId="CANVAS">
@@ -95,9 +79,10 @@ const SceneRenderer = () => {
                       color={model.color}
                       floorPlane={floorPlane}
                       isSelected={isSelected}
+                      controlRedx={controlRedx}
                       onSelectedModel={onSelectedModel}
                       updateModel={updateModel}
-                      // setEHCallables={isSelected && setChildEHCallables}
+                      clearControlAction={clearControlAction}
                     />
                   </Suspense>
                 );

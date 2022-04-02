@@ -25,9 +25,22 @@ const PusStpAccord = (props: any) => {
   const { updateModelControl } = props;
 
   const [continueModel, setContinueModel] = useState(true);
+  const [singleStepMode, setSingleStepMode] = useState(false);
+  const [singleStepEvent, setSingleStepEvent] = useState(false);
   const [stepSize, setStepSize] = useState<
     number | string | Array<number | string>
   >(0.05);
+
+  const changeContinue = () => {
+    setSingleStepMode(false);
+    setContinueModel(!continueModel);
+  };
+
+  const changeSingleStep = () => {
+    if (!singleStepMode) setContinueModel(false);
+    setSingleStepEvent(!singleStepEvent);
+    setSingleStepMode(true);
+  };
 
   const handleStepSliderChange = (
     event: Event,
@@ -51,8 +64,13 @@ const PusStpAccord = (props: any) => {
   useEffect(() => {
     updateModelControl({
       continue_model: continueModel,
+      single_step: {
+        enabled: singleStepMode,
+        event: singleStepEvent,
+        size_of_next: stepSize,
+      },
     });
-  }, [continueModel]);
+  }, [continueModel, singleStepMode, singleStepEvent, stepSize]);
 
   return (
     <Accordion defaultExpanded={true} sx={{ p: 0, m: 0 }}>
@@ -69,10 +87,12 @@ const PusStpAccord = (props: any) => {
           aria-label="vertical outlined button group"
           fullWidth={true}
         >
-          <Button key="pc" onClick={() => setContinueModel(!continueModel)}>
+          <Button key="pc" onClick={() => changeContinue()}>
             pause/continue
           </Button>
-          <Button key="mss">make single step</Button>
+          <Button key="mss" onClick={() => changeSingleStep()}>
+            make single step
+          </Button>
         </ButtonGroup>
         <Grid container spacing={1}>
           <Grid item xs={5}>

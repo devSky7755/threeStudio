@@ -16,9 +16,11 @@ const Draggable3DModel = (props: any) => {
     setIsDragging,
     onSelectedModel,
     model,
+    controlRedx,
     isSelected,
     updateModel,
     floorPlane,
+    clearControlAction,
     ...rest
   } = props;
 
@@ -152,6 +154,11 @@ const Draggable3DModel = (props: any) => {
           show_skt: false,
           activate_all: true,
           continue_model: true,
+          single_step: {
+            enabled: false,
+            event: false,
+            size_of_next: 0.05,
+          },
         }),
     });
   }, [animationExist]);
@@ -221,7 +228,12 @@ const Draggable3DModel = (props: any) => {
       receiveShadow
       ref={ref}
     >
-      <RenderModel model={model} setAnimationExist={setAnimationExist} />
+      <RenderModel
+        model={model}
+        controlRedx={controlRedx}
+        clearControlAction={clearControlAction}
+        setAnimationExist={setAnimationExist}
+      />
     </animated.group>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -8,6 +8,11 @@ import Grid from "@mui/material/Grid";
 import MuiInput from "@mui/material/Input";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
+import { useDispatch, useSelector } from "react-redux";
+import Emitter, {
+  EMIT_WEIGHT_CHANGED,
+  EMIT_WEIGHT_CHANGED_BY_CONTROL,
+} from "../../service/emitter";
 
 const Item = styled(Typography)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -20,66 +25,122 @@ const Input = styled(MuiInput)`
 `;
 
 const BlendWeightAccord = (props: any) => {
+  const controlRedx = useSelector((state: any) => state.control);
+  const [isEffective, setIsEffective] = useState(false);
+
+  useEffect(() => {
+    if (!controlRedx?.action) {
+      return;
+    }
+    setIsEffective(true);
+    setTimeout(() => {
+      setIsEffective(false);
+    }, (controlRedx.duration + 0.9) * 1000);
+  }, [controlRedx]);
+
+  const setWeights = (weights: any) => {
+    setIdle(weights?.idle || 0);
+    setWalk(weights?.walk || 0);
+    setRun(weights?.run || 0);
+  };
+
+  useEffect(() => {
+    if (isEffective) {
+      Emitter.on(EMIT_WEIGHT_CHANGED, setWeights);
+    } else {
+      Emitter.offAll(EMIT_WEIGHT_CHANGED);
+    }
+  }, [isEffective]);
+
   const [idle, setIdle] = useState<number | string | Array<number | string>>(0);
-
   const [walk, setWalk] = useState<number | string | Array<number | string>>(1);
-
   const [run, setRun] = useState<number | string | Array<number | string>>(0);
-
-  const [time, setTime] = useState<number | string | Array<number | string>>(1);
 
   const handleIdleSliderChange = (
     event: Event,
     newValue: number | number[]
   ) => {
-    setIdle(newValue);
+    updateIdle(newValue);
   };
 
   const handleIdleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setIdle(event.target.value === "" ? "" : Number(event.target.value));
+    const newValue =
+      event.target.value === "" ? "" : Number(event.target.value);
+    updateIdle(newValue);
   };
 
   const handleIdleBlur = () => {
     if (idle < 0) {
-      setIdle(0);
+      updateIdle(0);
     } else if (idle > 1) {
-      setIdle(1);
+      updateIdle(1);
     }
+  };
+
+  const updateIdle = (newValue: any) => {
+    setIdle(newValue);
+    Emitter.emit(EMIT_WEIGHT_CHANGED_BY_CONTROL, {
+      idle: newValue,
+      walk,
+      run,
+    });
   };
 
   const handleWalkSliderChange = (
     event: Event,
     newValue: number | number[]
   ) => {
-    setWalk(newValue);
+    updateWalk(newValue);
   };
 
   const handleWalkInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setWalk(event.target.value === "" ? "" : Number(event.target.value));
+    const newValue =
+      event.target.value === "" ? "" : Number(event.target.value);
+    updateWalk(newValue);
   };
 
   const handleWalkBlur = () => {
     if (walk < 0) {
-      setWalk(0);
+      updateWalk(0);
     } else if (walk > 1) {
-      setWalk(1);
+      updateWalk(1);
     }
   };
 
+  const updateWalk = (newValue: any) => {
+    setWalk(newValue);
+    Emitter.emit(EMIT_WEIGHT_CHANGED_BY_CONTROL, {
+      idle,
+      walk: newValue,
+      run,
+    });
+  };
+
   const handleRunSliderChange = (event: Event, newValue: number | number[]) => {
-    setRun(newValue);
+    updateRun(newValue);
   };
 
   const handleRunInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setRun(event.target.value === "" ? "" : Number(event.target.value));
+    const newValue =
+      event.target.value === "" ? "" : Number(event.target.value);
+    updateRun(newValue);
   };
 
   const handleRunBlur = () => {
     if (run < 0) {
-      setRun(0);
+      updateRun(0);
     } else if (run > 1) {
-      setRun(1);
+      updateRun(1);
     }
+  };
+
+  const updateRun = (newValue: any) => {
+    setRun(newValue);
+    Emitter.emit(EMIT_WEIGHT_CHANGED_BY_CONTROL, {
+      idle,
+      walk,
+      run: newValue,
+    });
   };
 
   return (

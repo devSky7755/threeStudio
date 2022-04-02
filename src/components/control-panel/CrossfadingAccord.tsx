@@ -11,6 +11,13 @@ import ButtonGroup from "@mui/material/ButtonGroup";
 import MuiInput from "@mui/material/Input";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  COMMIT_CONTROL_ACTION,
+  IDLE_ACTION,
+  RUN_ACTION,
+  WALK_ACTION,
+} from "../../store/actions";
 
 const Item = styled(Typography)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -23,19 +30,101 @@ const Input = styled(MuiInput)`
 `;
 
 const CrossfadingAccord = (props: any) => {
-  const [duration, setDuration] = useState<
-    number | string | Array<number | string>
-  >(3.5);
+  const { updateModelControl } = props;
+  const dispatch = useDispatch();
 
-  const handleDurationSliderChange = (
-    event: Event,
-    newValue: number | number[]
+  const [defaultDur, setDefaultDur] = useState(true);
+  const [duration, setDuration] = useState<number>(3.5);
+  const [disabled, setDisabled] = useState({
+    walkToIdle: false,
+    idleToWalk: true,
+    walkToRun: false,
+    runToWalk: true,
+  });
+
+  const walkToIdle = () => {
+    setDisabled({
+      walkToIdle: true,
+      idleToWalk: false,
+      walkToRun: true,
+      runToWalk: true,
+    });
+    prepareCrossFade(WALK_ACTION, IDLE_ACTION, 1.0);
+  };
+  const idleToWalk = () => {
+    setDisabled({
+      walkToIdle: false,
+      idleToWalk: true,
+      walkToRun: false,
+      runToWalk: true,
+    });
+    prepareCrossFade(IDLE_ACTION, WALK_ACTION, 0.5);
+  };
+  const walkToRun = () => {
+    setDisabled({
+      walkToIdle: true,
+      idleToWalk: true,
+      walkToRun: true,
+      runToWalk: false,
+    });
+    prepareCrossFade(WALK_ACTION, RUN_ACTION, 2.5);
+  };
+  const runToWalk = () => {
+    setDisabled({
+      walkToIdle: false,
+      idleToWalk: true,
+      walkToRun: false,
+      runToWalk: true,
+    });
+    prepareCrossFade(RUN_ACTION, WALK_ACTION, 5.0);
+  };
+
+  const prepareCrossFade = (
+    startAction: string,
+    endAction: string,
+    defaultDur = 1.0
   ) => {
+    const dur: number = defaultDur ? defaultDur : duration;
+    disableStepMode();
+    updateControlAction(startAction, endAction, dur);
+  };
+
+  const updateControlAction = (
+    startAction: string,
+    endAction: string,
+    dur: number
+  ) => {
+    dispatch({
+      type: COMMIT_CONTROL_ACTION,
+      payload: {
+        action: {
+          start: startAction,
+          end: endAction,
+        },
+        duration: dur,
+      },
+    });
+  };
+
+  const disableStepMode = () => {
+    updateModelControl({
+      continue_model: true,
+      single_step: {
+        enabled: false,
+      },
+    });
+  };
+
+  const handleDefaultDurChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setDefaultDur(event.target.checked);
+  };
+
+  const handleDurationSliderChange = (event: Event, newValue: any) => {
     setDuration(newValue);
   };
 
   const handleDurationInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setDuration(event.target.value === "" ? "" : Number(event.target.value));
+    setDuration(event.target.value === "" ? 10 : Number(event.target.value));
   };
 
   const handleDurationBlur = () => {
@@ -61,13 +150,25 @@ const CrossfadingAccord = (props: any) => {
           aria-label="vertical outlined button group"
           fullWidth={true}
         >
-          <Button key="fwti">from walk to idle</Button>
-          <Button key="fitw" disabled>
-            from idle to work
+          <Button
+            key="fwti"
+            disabled={disabled?.walkToIdle}
+            onClick={walkToIdle}
+          >
+            from walk to idle
           </Button>
-          <Button key="fwtr">from walk to run</Button>
-          <Button key="frtw" disabled>
-            from run to work
+          <Button
+            key="fitw"
+            disabled={disabled?.idleToWalk}
+            onClick={idleToWalk}
+          >
+            from idle to walk
+          </Button>
+          <Button key="fwtr" disabled={disabled?.walkToRun} onClick={walkToRun}>
+            from walk to run
+          </Button>
+          <Button key="frtw" disabled={disabled?.runToWalk} onClick={runToWalk}>
+            from run to walk
           </Button>
         </ButtonGroup>
         <Grid container spacing={1}>
@@ -75,7 +176,7 @@ const CrossfadingAccord = (props: any) => {
             <Item>use default duration</Item>
           </Grid>
           <Grid item xs={7}>
-            <Checkbox defaultChecked />
+            <Checkbox checked={defaultDur} onChange={handleDefaultDurChange} />
           </Grid>
         </Grid>
         <Grid container spacing={1} sx={{ mt: -1.45 }}>

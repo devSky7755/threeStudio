@@ -8,6 +8,9 @@ import Grid from "@mui/material/Grid";
 import MuiInput from "@mui/material/Input";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
+import Emitter, {
+  EMIT_TIME_SCALE_CHANGED_BY_CONTROL,
+} from "../../service/emitter";
 
 const Item = styled(Typography)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -26,19 +29,28 @@ const GeneralSpdAccord = (props: any) => {
     event: Event,
     newValue: number | number[]
   ) => {
-    setTime(newValue);
+    updateTimeScale(newValue);
   };
 
   const handleTimeInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setTime(event.target.value === "" ? "" : Number(event.target.value));
+    const newValue =
+      event.target.value === "" ? "" : Number(event.target.value);
+    updateTimeScale(newValue);
   };
 
   const handleTimeBlur = () => {
     if (time < 0) {
-      setTime(0);
+      updateTimeScale(0);
     } else if (time > 1.5) {
-      setTime(1.5);
+      updateTimeScale(1.5);
     }
+  };
+
+  const updateTimeScale = (newValue: any) => {
+    setTime(newValue);
+    Emitter.emit(EMIT_TIME_SCALE_CHANGED_BY_CONTROL, {
+      timeScale: newValue,
+    });
   };
 
   return (

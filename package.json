@@ -22,6 +22,7 @@
     "@types/react-redux": "^7.1.23",
     "@types/styled-components": "^5.1.24",
     "@use-gesture/react": "^10.2.9",
+    "eventemitter3": "^4.0.7",
     "flexlayout-react": "^0.6.9",
     "jquery": "^3.6.0",
     "lodash": "^4.17.21",
