@@ -33,12 +33,12 @@ export const GLB = {
     {
       id: uuid(),
       name: "Cat.glb",
-      useJSX: true,
+      use_jsx: true,
     },
     {
       id: uuid(),
       name: "Soldier.glb",
-      useJSX: true,
+      use_jsx: true,
     },
   ],
 };

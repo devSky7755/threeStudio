@@ -1,63 +1,32 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useLoader, useThree } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
 import { animated, useSpring } from "@react-spring/three";
 import { Raycaster, Vector3, Mesh } from "three";
 import debounce from "lodash/debounce";
-import * as THREE from "three";
+import RenderModel from "./models/RenderModel";
 
-import { loader, getObj } from "../../service/scene-renderer";
-import { JSXModelComponents } from "../../provider/mock";
-
-interface OrgColors {
+interface OrgColor {
   initiated: boolean;
   values: any[];
 }
-const RenderModel = (props: any) => {
-  const { model, setAnimationExist, ...rest } = props;
-  const obj = getObj(
-    model,
-    useLoader(loader(model), "/assets/" + model.type + "/" + model.file_name)
-  );
-
-  useEffect(() => {
-    setAnimationExist(model.useJSX);
-  }, [model.useJSX, setAnimationExist]);
-
-  const CustomTag =
-    JSXModelComponents[model?.file_name?.replace(/\.[^/.]+$/, "") || "Soldier"];
-
-  return (
-    <>
-      {!model.useJSX && <primitive {...rest} object={obj} scale={0.1} />}
-      {model.useJSX && (
-        <CustomTag
-          modelControl={model.control}
-          {...rest}
-          setAnimationExist={setAnimationExist}
-        ></CustomTag>
-      )}
-    </>
-  );
-};
 
 const Draggable3DModel = (props: any) => {
   const {
     setIsDragging,
-    model,
-    color,
-    floorPlane,
     onSelectedModel,
-    updateModel,
+    model,
     isSelected,
-    // setEHCallables,
+    updateModel,
+    floorPlane,
     ...rest
   } = props;
+
   const ref = useRef<any>();
   const [animationExist, setAnimationExist] = useState(false);
-  const [position, setPosition] = useState([0, 0, 0]);
+  const [position, setPosition] = useState([0, 0, 0]); // 3D Position
   const [firstPos, setFirstPos] = useState<any>(model.position);
-  const [originColors, setOrgColors] = useState<OrgColors>({
+  const [originColor, setOrgColor] = useState<OrgColor>({
     initiated: false,
     values: [],
   });
@@ -67,7 +36,7 @@ const Draggable3DModel = (props: any) => {
   const [spring, api] = useSpring(() => ({
     position: position,
     scale: 1,
-    rotation: [0, 0, 0],
+    rotation: model.rotation || [0, 0, 0],
     config: { friction: 10 },
     immediate: true,
   }));
@@ -80,13 +49,22 @@ const Draggable3DModel = (props: any) => {
     }
   }, [model.position]);
 
+  useEffect(() => {
+    if (model.rotation) {
+      api.start({
+        rotation: model.rotation,
+        immediate: true,
+      });
+    }
+  }, [model.rotation]);
+
   const downHandler = ({ key }: { key: string }) => {
     switch (key) {
       case "ArrowLeft":
-        isSelected && doLeftAction();
+        isSelected && doLeftAction(model.position);
         break;
       case "ArrowRight":
-        isSelected && doRightAction();
+        isSelected && doRightAction(model.position);
         break;
       default:
         break;
@@ -100,93 +78,26 @@ const Draggable3DModel = (props: any) => {
     };
   });
 
-  const doLeftAction = useCallback(() => {
+  const doLeftAction = (position: any) => {
     updateModel({
       ...model,
       position: {
-        x: model.position.x - 3,
-        y: model.position.y,
+        x: position.x - 2,
+        y: position.y,
       },
-    });
-  }, [position]);
-
-  const doRightAction = useCallback(() => {
-    updateModel({
-      ...model,
-      position: {
-        x: model.position.x + 3,
-        y: model.position.y,
-      },
-    });
-  }, [position]);
-
-  useEffect(() => {
-    isSelected && setObjectColor(color);
-    // isSelected &&
-    //   setEHCallables &&
-    //   setEHCallables({
-    //     doLeftAction,
-    //     doRightAction,
-    //   });
-  }, [color, isSelected /*, setEHCallables, doLeftAction*/]);
-
-  useEffect(() => {
-    updateModel({
-      ...model,
-      animation: animationExist,
-      control:
-        animationExist &&
-        (model.control || {
-          show_model: true,
-          show_skt: false,
-          activate_all: true,
-          continue_model: true,
-        }),
-    });
-  }, [animationExist]);
-
-  const initiateOrgColors = () => {
-    const values: any = [];
-    let index = 0;
-    ref.current.traverse(function (mesh: any) {
-      if (mesh instanceof Mesh) {
-        values.push({
-          index,
-          color: mesh.material.color.getHexString(),
-        });
-        index++;
-      }
-    });
-    setOrgColors({
-      initiated: true,
-      values,
+      rotation: [0, -Math.PI / 2, 0],
     });
   };
 
-  const setObjectColor = (color: string) => {
-    if (ref) {
-      if (color) {
-        if (!originColors.initiated) {
-          initiateOrgColors();
-        }
-        ref.current.traverse(function (mesh: any) {
-          if (mesh instanceof Mesh) {
-            mesh.material.color.set(color);
-          }
-        });
-      } else {
-        let index = 0;
-        ref.current.traverse(function (mesh: any) {
-          if (mesh instanceof Mesh) {
-            const meshColor = originColors.values.find(
-              (val) => val.index === index
-            )?.color;
-            meshColor && mesh.material.color.set("#" + meshColor);
-            index++;
-          }
-        });
-      }
-    }
+  const doRightAction = (position: any) => {
+    updateModel({
+      ...model,
+      position: {
+        x: position.x + 2,
+        y: position.y,
+      },
+      rotation: [0, Math.PI / 2, 0],
+    });
   };
 
   const cacluate3DPosFrom2DPos = (pos: any): number[] => {
@@ -225,6 +136,69 @@ const Draggable3DModel = (props: any) => {
     },
     { delay: true }
   );
+
+  useEffect(() => {
+    isSelected && setObjectColor(model.color);
+  }, [model.color, isSelected]);
+
+  useEffect(() => {
+    updateModel({
+      ...model,
+      animation: animationExist,
+      control:
+        animationExist &&
+        (model.control || {
+          show_model: true,
+          show_skt: false,
+          activate_all: true,
+          continue_model: true,
+        }),
+    });
+  }, [animationExist]);
+
+  const initiateOrgColor = () => {
+    const values: any = [];
+    let index = 0;
+    ref.current.traverse(function (mesh: any) {
+      if (mesh instanceof Mesh) {
+        values.push({
+          index,
+          color: mesh.material.color.getHexString(),
+        });
+        index++;
+      }
+    });
+    setOrgColor({
+      initiated: true,
+      values,
+    });
+  };
+
+  const setObjectColor = (color: string) => {
+    if (ref) {
+      if (color) {
+        if (!originColor.initiated) {
+          initiateOrgColor();
+        }
+        ref.current.traverse(function (mesh: any) {
+          if (mesh instanceof Mesh) {
+            mesh.material.color.set(color);
+          }
+        });
+      } else {
+        let index = 0;
+        ref.current.traverse(function (mesh: any) {
+          if (mesh instanceof Mesh) {
+            const meshColor = originColor.values.find(
+              (val) => val.index === index
+            )?.color;
+            meshColor && mesh.material.color.set("#" + meshColor);
+            index++;
+          }
+        });
+      }
+    }
+  };
 
   const debounceEmitOnSelect = useCallback(
     debounce((uuid: string) => {

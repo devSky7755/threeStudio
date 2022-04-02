@@ -13,9 +13,10 @@ export interface Model {
   uuid: string | null;
   file_name: string | null;
   type: string | null;
-  position: any | null;
+  position: any | null; // 2D Position
+  rotation: any | null;
   color: string | null;
-  useJSX?: boolean | null;
+  use_jsx?: boolean | null;
   animation?: boolean | null;
   control?: ModelControl | null;
 }
@@ -40,8 +41,9 @@ const modelReducer = (state = initialState, action: any) => {
           type: action.payload?.type,
           position: action.payload?.position,
           color: null,
-          useJSX: action.payload?.useJSX || false,
+          use_jsx: action.payload?.use_jsx || false,
           control: null,
+          rotation: [0, Math.PI / 2, 0],
         };
         const models = [...state.models, newModel];
         const selModel = newModel.uuid;

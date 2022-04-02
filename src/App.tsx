@@ -116,7 +116,7 @@ function App() {
               x: event?.offsetX,
               y: event?.offsetY,
             },
-            useJSX: selValue?.useJSX || false,
+            use_jsx: selValue?.use_jsx || false,
           },
         });
       }
