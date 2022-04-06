@@ -23,7 +23,6 @@ export interface Model {
   color: string | null;
   use_jsx?: boolean | null;
   animation?: boolean | null;
-  control?: ModelControl | null;
 }
 
 export const initialState: {
@@ -47,7 +46,6 @@ const modelReducer = (state = initialState, action: any) => {
           position: action.payload?.position,
           color: null,
           use_jsx: action.payload?.use_jsx || false,
-          control: null,
           rotation: [0, Math.PI / 2, 0],
         };
         const models = [...state.models, newModel];

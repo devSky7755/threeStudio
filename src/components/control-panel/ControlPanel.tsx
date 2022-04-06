@@ -8,13 +8,12 @@ import BlendWeightAccord from "./BlendWeightAccord";
 import GeneralSpdAccord from "./GeneralSpdAccord";
 import CrossfadingAccord from "./CrossfadingAccord";
 import { Model, ModelControl } from "../../store/modelReducer";
-import { UPDATE_MODEL } from "../../store/actions";
+import Emitter, { EMIT_CONTROL_EVENT } from "../../service/emitter";
 
 const ControlPanel = (props: any) => {
-  const dispatch = useDispatch();
-
   const modelRedx = useSelector((state: any) => state.model);
   const [selModel, setSelModel] = useState<Model | null>(null);
+  const [control, setControl] = useState<ModelControl>();
 
   useEffect(() => {
     const sModel = modelRedx.models.find(
@@ -23,23 +22,32 @@ const ControlPanel = (props: any) => {
     setSelModel(sModel);
   }, [modelRedx.models, modelRedx.selModel]);
 
-  const updateModelControl = (control: ModelControl) => {
-    console.log(selModel);
-    if (!selModel) return;
-    const cloneModel = {
-      ...selModel,
-      control: {
-        ...selModel?.control,
-        ...control,
-      },
-    };
-    dispatch({
-      type: UPDATE_MODEL,
-      payload: {
-        model: cloneModel,
+  useEffect(() => {
+    initControl();
+  }, [modelRedx.selModel]);
+
+  const initControl = () => {
+    setControl({
+      show_model: true,
+      show_skt: false,
+      activate_all: true,
+      continue_model: true,
+      single_step: {
+        enabled: false,
+        event: false,
+        size_of_next: 0.05,
       },
     });
   };
+
+  const updateModelControl = (updatedControl: ModelControl) => {
+    if (!selModel) return;
+    setControl({ ...control, ...updatedControl });
+  };
+
+  useEffect(() => {
+    Emitter.emit(EMIT_CONTROL_EVENT, { control });
+  }, [control]);
 
   return (
     <>

@@ -2,6 +2,7 @@ import EventEmitter from "eventemitter3";
 
 export const EMIT_KEY_LEFT = "key/left";
 export const EMIT_KEY_RIGHT = "key/right";
+export const EMIT_CONTROL_EVENT = "control/control-event";
 export const EMIT_WEIGHT_CHANGED = "control/weight-changed";
 export const EMIT_WEIGHT_CHANGED_BY_CONTROL =
   "control/weight-changed-by-control";

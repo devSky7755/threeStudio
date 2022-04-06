@@ -10,10 +10,10 @@ import Emitter, {
 } from "../../../service/emitter";
 
 export default function SoldierModel(props: any) {
-  const { modelControl, setAnimationExist, controlModel, ...rest } = props;
+  const { setAnimationExist, controlEvent, controlModel, ...rest } = props;
 
   const group = useRef();
-  // useHelper(modelControl.show_skt && group, THREE.SkeletonHelper);
+  // useHelper(controlEvent?.show_skt && group, THREE.SkeletonHelper);
   const { scene, nodes, materials, animations } = useGLTF(
     "/assets/glb/Soldier.glb"
   );
@@ -53,7 +53,7 @@ export default function SoldierModel(props: any) {
 
   const toSingleStep = () => {
     continueModel();
-    setStepSize(modelControl?.single_step?.size_of_next);
+    setStepSize(controlEvent?.single_step?.size_of_next);
   };
 
   useEffect(() => {
@@ -61,18 +61,18 @@ export default function SoldierModel(props: any) {
   }, [animations, activateAllActions, setAnimationExist]);
 
   useEffect(() => {
-    modelControl?.activate_all && activateAllActions();
-    !modelControl?.activate_all && deActivateAllActions();
-  }, [modelControl?.activate_all, activateAllActions, deActivateAllActions]);
+    controlEvent?.activate_all && activateAllActions();
+    !controlEvent?.activate_all && deActivateAllActions();
+  }, [controlEvent?.activate_all, activateAllActions, deActivateAllActions]);
 
   useEffect(() => {
-    modelControl?.continue_model && continueModel();
-    !modelControl?.continue_model && pauseModel();
-  }, [modelControl?.continue_model, continueModel, pauseModel]);
+    controlEvent?.continue_model && continueModel();
+    !controlEvent?.continue_model && pauseModel();
+  }, [controlEvent?.continue_model, continueModel, pauseModel]);
 
   useEffect(() => {
-    modelControl?.single_step?.enabled && toSingleStep();
-  }, [modelControl?.single_step?.enabled, modelControl?.single_step?.event]);
+    controlEvent?.single_step?.enabled && toSingleStep();
+  }, [controlEvent?.single_step?.enabled, controlEvent?.single_step?.event]);
 
   useEffect(() => {
     if (!controlModel?.action) return;
@@ -125,7 +125,7 @@ export default function SoldierModel(props: any) {
   };
 
   useFrame((state, delta) => {
-    if (modelControl?.single_step?.enabled) {
+    if (controlEvent?.single_step?.enabled) {
       mixer.update(stepSize);
       setStepSize(0);
     } else mixer.update(delta);
@@ -156,7 +156,7 @@ export default function SoldierModel(props: any) {
 
   return (
     <group ref={group} {...rest} dispose={null}>
-      <group name="Scene" visible={modelControl?.show_model}>
+      <group name="Scene" visible={controlEvent?.show_model}>
         <group
           name="Character"
           rotation={[-Math.PI / 2, 0, Math.PI]}

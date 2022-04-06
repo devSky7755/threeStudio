@@ -22,11 +22,7 @@ const RenderModel = (props: any) => {
     <>
       {!model.use_jsx && <primitive {...rest} object={obj} scale={0.1} />}
       {model.use_jsx && (
-        <CustomTag
-          modelControl={model.control}
-          {...rest}
-          setAnimationExist={setAnimationExist}
-        ></CustomTag>
+        <CustomTag {...rest} setAnimationExist={setAnimationExist}></CustomTag>
       )}
     </>
   );

@@ -7,9 +7,11 @@ import debounce from "lodash/debounce";
 import RenderModel from "./models/RenderModel";
 import Emitter, {
   COMMIT_CONTROL_ACTION,
+  EMIT_CONTROL_EVENT,
   EMIT_KEY_LEFT,
   EMIT_KEY_RIGHT,
 } from "../../service/emitter";
+import { ModelControl } from "../../store/modelReducer";
 
 interface OrgColor {
   initiated: boolean;
@@ -24,17 +26,16 @@ const Draggable3DModel = (props: any) => {
     setIsDragging,
     onSelectedModel,
     model,
-    // controlRedx,
     isSelected,
     updateModel,
     floorPlane,
-    // clearControlAction,
     ...rest
   } = props;
 
   const ref = useRef<any>();
   const [animationExist, setAnimationExist] = useState(false);
   const prevModelRotationRef = useRef<Array<any>>([]);
+  const [controlEvent, setControlEvent] = useState<ModelControl>();
   const [controlModel, setControlModel] = useState();
 
   const { gl, mouse, camera } = useThree();
@@ -115,6 +116,12 @@ const Draggable3DModel = (props: any) => {
     });
     Emitter.on(EMIT_KEY_RIGHT, () => {
       isSelected && doRightAction();
+    });
+    Emitter.on(EMIT_CONTROL_EVENT, (payload) => {
+      isSelected &&
+        setControlEvent({
+          ...payload?.control,
+        });
     });
     Emitter.on(COMMIT_CONTROL_ACTION, (payload) => {
       isSelected && setControlModel(payload);
@@ -249,6 +256,7 @@ const Draggable3DModel = (props: any) => {
     >
       <RenderModel
         model={model}
+        controlEvent={controlEvent}
         controlModel={controlModel}
         setAnimationExist={setAnimationExist}
       />
