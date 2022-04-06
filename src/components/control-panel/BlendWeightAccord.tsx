@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Emitter, {
   EMIT_WEIGHT_CHANGED,
   EMIT_WEIGHT_CHANGED_BY_CONTROL,
+  COMMIT_CONTROL_ACTION,
 } from "../../service/emitter";
 
 const Item = styled(Typography)(({ theme }) => ({
@@ -25,18 +26,19 @@ const Input = styled(MuiInput)`
 `;
 
 const BlendWeightAccord = (props: any) => {
-  const controlRedx = useSelector((state: any) => state.control);
   const [isEffective, setIsEffective] = useState(false);
 
   useEffect(() => {
-    if (!controlRedx?.action) {
-      return;
-    }
-    setIsEffective(true);
-    setTimeout(() => {
-      setIsEffective(false);
-    }, (controlRedx.duration + 0.9) * 1000);
-  }, [controlRedx]);
+    Emitter.on(COMMIT_CONTROL_ACTION, (payload) => {
+      setIsEffective(true);
+      setTimeout(() => {
+        setIsEffective(false);
+      }, (payload.duration + 0.9) * 1000);
+    });
+    return () => {
+      Emitter.offAll(COMMIT_CONTROL_ACTION);
+    };
+  }, []);
 
   const setWeights = (weights: any) => {
     setIdle(weights?.idle || 0);

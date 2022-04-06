@@ -90,7 +90,7 @@ const modelReducer = (state = initialState, action: any) => {
     case actionTypes.UPDATE_MODEL:
       const nModels = state.models.map((model) => {
         if (model.uuid === action.payload?.model?.uuid) {
-          return { ...action.payload?.model };
+          return { ...model, ...action.payload?.model };
         }
         return model;
       });

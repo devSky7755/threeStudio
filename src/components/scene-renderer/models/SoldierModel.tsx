@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useGLTF, useHelper } from "@react-three/drei";
+import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
-import { IDLE_ACTION, RUN_ACTION, WALK_ACTION } from "../../../store/actions";
+import { IDLE_ACTION, WALK_ACTION } from "../../../store/actions";
 import Emitter, {
   EMIT_TIME_SCALE_CHANGED_BY_CONTROL,
   EMIT_WEIGHT_CHANGED,
@@ -10,13 +10,7 @@ import Emitter, {
 } from "../../../service/emitter";
 
 export default function SoldierModel(props: any) {
-  const {
-    modelControl,
-    setAnimationExist,
-    controlRedx,
-    clearControlAction,
-    ...rest
-  } = props;
+  const { modelControl, setAnimationExist, controlModel, ...rest } = props;
 
   const group = useRef();
   // useHelper(modelControl.show_skt && group, THREE.SkeletonHelper);
@@ -81,15 +75,15 @@ export default function SoldierModel(props: any) {
   }, [modelControl?.single_step?.enabled, modelControl?.single_step?.event]);
 
   useEffect(() => {
-    if (!controlRedx?.action) return;
-    const startAction = getAction(controlRedx.action.start);
-    const endAction = getAction(controlRedx.action.end);
-    if (controlRedx.action.start === IDLE_ACTION) {
+    if (!controlModel?.action) return;
+    const startAction = getAction(controlModel.action.start);
+    const endAction = getAction(controlModel.action.end);
+    if (controlModel.action.start === IDLE_ACTION) {
       executeCrossFade(startAction, endAction);
     } else {
       synchronizeCrossFade(startAction, endAction);
     }
-  }, [controlRedx]);
+  }, [controlModel]);
 
   const synchronizeCrossFade = (
     startAction: THREE.AnimationAction,
@@ -110,8 +104,7 @@ export default function SoldierModel(props: any) {
   ) => {
     setWeight(endAction, 1);
     endAction.time = 0;
-    startAction.crossFadeTo(endAction, controlRedx.duration, true);
-    clearControlAction();
+    startAction.crossFadeTo(endAction, controlModel.duration, true);
   };
 
   const getAction = (action: string) => {

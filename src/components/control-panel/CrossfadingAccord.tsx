@@ -11,13 +11,8 @@ import ButtonGroup from "@mui/material/ButtonGroup";
 import MuiInput from "@mui/material/Input";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  COMMIT_CONTROL_ACTION,
-  IDLE_ACTION,
-  RUN_ACTION,
-  WALK_ACTION,
-} from "../../store/actions";
+import { IDLE_ACTION, RUN_ACTION, WALK_ACTION } from "../../store/actions";
+import Emitter, { COMMIT_CONTROL_ACTION } from "../../service/emitter";
 
 const Item = styled(Typography)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -31,7 +26,6 @@ const Input = styled(MuiInput)`
 
 const CrossfadingAccord = (props: any) => {
   const { updateModelControl } = props;
-  const dispatch = useDispatch();
 
   const [defaultDur, setDefaultDur] = useState(true);
   const [duration, setDuration] = useState<number>(3.5);
@@ -94,15 +88,12 @@ const CrossfadingAccord = (props: any) => {
     endAction: string,
     dur: number
   ) => {
-    dispatch({
-      type: COMMIT_CONTROL_ACTION,
-      payload: {
-        action: {
-          start: startAction,
-          end: endAction,
-        },
-        duration: dur,
+    Emitter.emit(COMMIT_CONTROL_ACTION, {
+      action: {
+        start: startAction,
+        end: endAction,
       },
+      duration: dur,
     });
   };
 

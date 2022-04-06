@@ -24,6 +24,7 @@ const ControlPanel = (props: any) => {
   }, [modelRedx.models, modelRedx.selModel]);
 
   const updateModelControl = (control: ModelControl) => {
+    console.log(selModel);
     if (!selModel) return;
     const cloneModel = {
       ...selModel,

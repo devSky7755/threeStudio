@@ -5,102 +5,39 @@ import { animated, useSpring } from "@react-spring/three";
 import { Raycaster, Vector3, Mesh } from "three";
 import debounce from "lodash/debounce";
 import RenderModel from "./models/RenderModel";
+import Emitter, {
+  COMMIT_CONTROL_ACTION,
+  EMIT_KEY_LEFT,
+  EMIT_KEY_RIGHT,
+} from "../../service/emitter";
 
 interface OrgColor {
   initiated: boolean;
   values: any[];
 }
 
+const isSameArray = (arr1: Array<any>, arr2: Array<any>): boolean =>
+  arr1.length === arr2.length && arr1.every((o, idx) => o === arr2[idx]);
+
 const Draggable3DModel = (props: any) => {
   const {
     setIsDragging,
     onSelectedModel,
     model,
-    controlRedx,
+    // controlRedx,
     isSelected,
     updateModel,
     floorPlane,
-    clearControlAction,
+    // clearControlAction,
     ...rest
   } = props;
 
   const ref = useRef<any>();
   const [animationExist, setAnimationExist] = useState(false);
-  const [position, setPosition] = useState([0, 0, 0]); // 3D Position
-  const [firstPos, setFirstPos] = useState<any>(model.position);
-  const [originColor, setOrgColor] = useState<OrgColor>({
-    initiated: false,
-    values: [],
-  });
+  const prevModelRotationRef = useRef<Array<any>>([]);
+  const [controlModel, setControlModel] = useState();
 
   const { gl, mouse, camera } = useThree();
-
-  const [spring, api] = useSpring(() => ({
-    position: position,
-    scale: 1,
-    rotation: model.rotation || [0, 0, 0],
-    config: { friction: 10 },
-    immediate: true,
-  }));
-
-  useEffect(() => {
-    if (model.position) {
-      setFirstPos(model.position);
-      const calcPos = cacluate3DPosFrom2DPos(model.position);
-      moveToNewPos(calcPos);
-    }
-  }, [model.position]);
-
-  useEffect(() => {
-    if (model.rotation) {
-      api.start({
-        rotation: model.rotation,
-        immediate: true,
-      });
-    }
-  }, [model.rotation]);
-
-  const downHandler = ({ key }: { key: string }) => {
-    switch (key) {
-      case "ArrowLeft":
-        isSelected && doLeftAction(model.position);
-        break;
-      case "ArrowRight":
-        isSelected && doRightAction(model.position);
-        break;
-      default:
-        break;
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("keydown", downHandler);
-    return () => {
-      document.removeEventListener("keydown", downHandler);
-    };
-  });
-
-  const doLeftAction = (position: any) => {
-    updateModel({
-      ...model,
-      position: {
-        x: position.x - 2,
-        y: position.y,
-      },
-      rotation: [0, -Math.PI / 2, 0],
-    });
-  };
-
-  const doRightAction = (position: any) => {
-    updateModel({
-      ...model,
-      position: {
-        x: position.x + 2,
-        y: position.y,
-      },
-      rotation: [0, Math.PI / 2, 0],
-    });
-  };
 
   const cacluate3DPosFrom2DPos = (pos: any): number[] => {
     const planeIntersectPoint = new Vector3(0, 0, 0);
@@ -114,12 +51,101 @@ const Draggable3DModel = (props: any) => {
     return [planeIntersectPoint.x, planeIntersectPoint.y, 0];
   };
 
-  const moveToNewPos = (threeDPos: any) => {
+  const [position, setPosition] = useState(
+    cacluate3DPosFrom2DPos(model.position)
+  ); // 3D Position
+  const [firstPos, setFirstPos] = useState<any>(model.position);
+  const [originColor, setOrgColor] = useState<OrgColor>({
+    initiated: false,
+    values: [],
+  });
+
+  const [spring, api] = useSpring(() => ({
+    position: position,
+    scale: 1,
+    rotation: model.rotation || [0, 0, 0],
+    immediate: true,
+  }));
+
+  useEffect(() => {
+    if (model.position) {
+      setFirstPos(model.position);
+      moveToNewPos(cacluate3DPosFrom2DPos(model.position), false);
+    }
+  }, [model.position]);
+
+  useEffect(() => {
+    if (!isSameArray(prevModelRotationRef.current, model.rotation)) {
+      prevModelRotationRef.current = model.rotation;
+      api.start({
+        rotation: model.rotation,
+        immediate: false,
+        config: {
+          tension: 100,
+        },
+      });
+    }
+  }, [model.rotation]);
+
+  const doLeftAction = useCallback(() => {
+    updateModel({
+      uuid: model.uuid,
+      position: {
+        x: model.position.x - 9,
+        y: model.position.y,
+      },
+      rotation: [0, -Math.PI / 2, 0],
+    });
+  }, [model.uuid, model.position]);
+
+  const doRightAction = useCallback(() => {
+    updateModel({
+      uuid: model.uuid,
+      position: {
+        x: model.position.x + 9,
+        y: model.position.y,
+      },
+      rotation: [0, Math.PI / 2, 0],
+    });
+  }, [model.uuid, model.position]);
+
+  useEffect(() => {
+    Emitter.on(EMIT_KEY_LEFT, () => {
+      isSelected && doLeftAction();
+    });
+    Emitter.on(EMIT_KEY_RIGHT, () => {
+      isSelected && doRightAction();
+    });
+    Emitter.on(COMMIT_CONTROL_ACTION, (payload) => {
+      isSelected && setControlModel(payload);
+    });
+    return () => {
+      Emitter.offAll(EMIT_KEY_LEFT);
+      Emitter.offAll(EMIT_KEY_RIGHT);
+      Emitter.offAll(COMMIT_CONTROL_ACTION);
+    };
+  }, [isSelected, doLeftAction, doRightAction]);
+
+  const moveToNewPos = (threeDPos: any, immediate: boolean = true) => {
     setPosition(threeDPos);
     api.start({
       position: threeDPos,
-      immediate: true,
+      immediate,
+      config: {
+        tension: 50,
+      },
     });
+  };
+
+  const debounceEmitOnSelect = useCallback(
+    debounce((uuid: string) => {
+      onSelectedModel(uuid);
+    }, 300),
+    []
+  );
+
+  const onClick = (event: React.PointerEvent<HTMLElement>) => {
+    debounceEmitOnSelect(model.uuid);
   };
 
   const bind = useDrag(
@@ -130,9 +156,13 @@ const Draggable3DModel = (props: any) => {
       const calcPos = cacluate3DPosFrom2DPos(newPos);
       if (!active) {
         setFirstPos(newPos);
-        updateModel({ ...model, position: newPos });
+        updateModel({
+          uuid: model.uuid,
+          position: newPos,
+        });
+        api.stop();
       }
-      moveToNewPos(calcPos);
+      moveToNewPos(calcPos, true);
       debounceEmitOnSelect(model.uuid);
       return timeStamp;
     },
@@ -145,7 +175,7 @@ const Draggable3DModel = (props: any) => {
 
   useEffect(() => {
     updateModel({
-      ...model,
+      uuid: model.uuid,
       animation: animationExist,
       control:
         animationExist &&
@@ -207,17 +237,6 @@ const Draggable3DModel = (props: any) => {
     }
   };
 
-  const debounceEmitOnSelect = useCallback(
-    debounce((uuid: string) => {
-      onSelectedModel(uuid);
-    }, 300),
-    []
-  );
-
-  const onClick = (event: React.PointerEvent<HTMLElement>) => {
-    debounceEmitOnSelect(model.uuid);
-  };
-
   return (
     <animated.group
       onClick={onClick}
@@ -230,8 +249,7 @@ const Draggable3DModel = (props: any) => {
     >
       <RenderModel
         model={model}
-        controlRedx={controlRedx}
-        clearControlAction={clearControlAction}
+        controlModel={controlModel}
         setAnimationExist={setAnimationExist}
       />
     </animated.group>
