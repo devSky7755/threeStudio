@@ -2,18 +2,6 @@
 import * as actionTypes from "./actions";
 import { v4 as uuid } from "uuid";
 
-export interface ModelControl {
-  show_model?: boolean | null;
-  show_skt?: boolean | null;
-  activate_all?: boolean | null;
-  continue_model?: boolean | null;
-  single_step?: {
-    enabled?: boolean | null;
-    event?: boolean | null;
-    size_of_next?: number | null;
-  };
-}
-
 export interface Model {
   uuid: string | null;
   file_name: string | null;

@@ -8,12 +8,12 @@ import Grid from "@mui/material/Grid";
 import MuiInput from "@mui/material/Input";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
-import { useDispatch, useSelector } from "react-redux";
-import Emitter, {
+import {
+  Emitter,
   EMIT_WEIGHT_CHANGED,
   EMIT_WEIGHT_CHANGED_BY_CONTROL,
   COMMIT_CONTROL_ACTION,
-} from "../../service/emitter";
+} from "../../service";
 
 const Item = styled(Typography)(({ theme }) => ({
   padding: theme.spacing(1),

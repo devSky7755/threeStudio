@@ -12,7 +12,7 @@ import MuiInput from "@mui/material/Input";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
 import { IDLE_ACTION, RUN_ACTION, WALK_ACTION } from "../../store/actions";
-import Emitter, { COMMIT_CONTROL_ACTION } from "../../service/emitter";
+import { Emitter, COMMIT_CONTROL_ACTION } from "../../service";
 
 const Item = styled(Typography)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -30,9 +30,9 @@ const CrossfadingAccord = (props: any) => {
   const [defaultDur, setDefaultDur] = useState(true);
   const [duration, setDuration] = useState<number>(3.5);
   const [disabled, setDisabled] = useState({
-    walkToIdle: false,
-    idleToWalk: true,
-    walkToRun: false,
+    walkToIdle: true,
+    idleToWalk: false,
+    walkToRun: true,
     runToWalk: true,
   });
 

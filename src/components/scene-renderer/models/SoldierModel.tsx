@@ -3,11 +3,12 @@ import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { IDLE_ACTION, WALK_ACTION } from "../../../store/actions";
-import Emitter, {
+import {
+  Emitter,
   EMIT_TIME_SCALE_CHANGED_BY_CONTROL,
   EMIT_WEIGHT_CHANGED,
   EMIT_WEIGHT_CHANGED_BY_CONTROL,
-} from "../../../service/emitter";
+} from "../../../service";
 
 export default function SoldierModel(props: any) {
   const { setAnimationExist, controlEvent, controlModel, ...rest } = props;
@@ -57,25 +58,30 @@ export default function SoldierModel(props: any) {
   };
 
   useEffect(() => {
+    console.log('--animation exist')
     setAnimationExist(animations.length > 0);
-  }, [animations, activateAllActions, setAnimationExist]);
+  }, [animations, setAnimationExist]);
 
   useEffect(() => {
+    console.log('controlEvent--active')
     controlEvent?.activate_all && activateAllActions();
     !controlEvent?.activate_all && deActivateAllActions();
   }, [controlEvent?.activate_all, activateAllActions, deActivateAllActions]);
 
   useEffect(() => {
+    console.log('controlEvent--continue')
     controlEvent?.continue_model && continueModel();
     !controlEvent?.continue_model && pauseModel();
   }, [controlEvent?.continue_model, continueModel, pauseModel]);
 
   useEffect(() => {
+    console.log('controlEvent--single step')
     controlEvent?.single_step?.enabled && toSingleStep();
   }, [controlEvent?.single_step?.enabled, controlEvent?.single_step?.event]);
 
   useEffect(() => {
     if (!controlModel?.action) return;
+    console.log('controlModel--')
     const startAction = getAction(controlModel.action.start);
     const endAction = getAction(controlModel.action.end);
     if (controlModel.action.start === IDLE_ACTION) {
@@ -129,30 +135,33 @@ export default function SoldierModel(props: any) {
       mixer.update(stepSize);
       setStepSize(0);
     } else mixer.update(delta);
-    const idleWeight = idleAction.getEffectiveWeight();
-    const walkWeight = walkAction.getEffectiveWeight();
-    const runWeight = runAction.getEffectiveWeight();
-    Emitter.emit(EMIT_WEIGHT_CHANGED, {
-      idle: idleWeight,
-      walk: walkWeight,
-      run: runWeight,
-    });
+    // const idleWeight = idleAction.getEffectiveWeight();
+    // const walkWeight = walkAction.getEffectiveWeight();
+    // const runWeight = runAction.getEffectiveWeight();
+    // Emitter.emit(EMIT_WEIGHT_CHANGED, {
+    //   idle: idleWeight,
+    //   walk: walkWeight,
+    //   run: runWeight,
+    // });
   });
 
-  useEffect(() => {
-    Emitter.on(EMIT_WEIGHT_CHANGED_BY_CONTROL, (weights) => {
-      setWeight(walkAction, weights.walk);
-      setWeight(idleAction, weights.idle);
-      setWeight(runAction, weights.run);
-    });
-    Emitter.on(EMIT_TIME_SCALE_CHANGED_BY_CONTROL, (conf) => {
-      mixer.timeScale = conf.timeScale;
-    });
-    return () => {
-      Emitter.offAll(EMIT_WEIGHT_CHANGED_BY_CONTROL);
-      Emitter.offAll(EMIT_TIME_SCALE_CHANGED_BY_CONTROL);
-    };
-  }, []);
+  // useEffect(() => {
+  //   Emitter.on(EMIT_WEIGHT_CHANGED_BY_CONTROL, (weights) => {
+  //     console.log("side-effect-1");
+  //     setWeight(walkAction, weights.walk);
+  //     setWeight(idleAction, weights.idle);
+  //     setWeight(runAction, weights.run);
+  //   });
+  //   Emitter.on(EMIT_TIME_SCALE_CHANGED_BY_CONTROL, (conf) => {
+  //     console.log("side-effect-2");
+  //     mixer.timeScale = conf.timeScale;
+  //   });
+  //   return () => {
+  //     Emitter.offAll(EMIT_WEIGHT_CHANGED_BY_CONTROL);
+  //     console.log("side-effect-3");
+  //     Emitter.offAll(EMIT_TIME_SCALE_CHANGED_BY_CONTROL);
+  //   };
+  // }, []);
 
   return (
     <group ref={group} {...rest} dispose={null}>

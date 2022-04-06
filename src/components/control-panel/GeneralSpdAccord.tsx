@@ -8,9 +8,7 @@ import Grid from "@mui/material/Grid";
 import MuiInput from "@mui/material/Input";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
-import Emitter, {
-  EMIT_TIME_SCALE_CHANGED_BY_CONTROL,
-} from "../../service/emitter";
+import { Emitter, EMIT_TIME_SCALE_CHANGED_BY_CONTROL } from "../../service";
 
 const Item = styled(Typography)(({ theme }) => ({
   padding: theme.spacing(1),

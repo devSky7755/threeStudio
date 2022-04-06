@@ -5,13 +5,12 @@ import { animated, useSpring } from "@react-spring/three";
 import { Raycaster, Vector3, Mesh } from "three";
 import debounce from "lodash/debounce";
 import RenderModel from "./models/RenderModel";
-import Emitter, {
+import {
   COMMIT_CONTROL_ACTION,
-  EMIT_CONTROL_EVENT,
+  Emitter,
   EMIT_KEY_LEFT,
   EMIT_KEY_RIGHT,
-} from "../../service/emitter";
-import { ModelControl } from "../../store/modelReducer";
+} from "../../service";
 
 interface OrgColor {
   initiated: boolean;
@@ -29,13 +28,13 @@ const Draggable3DModel = (props: any) => {
     isSelected,
     updateModel,
     floorPlane,
+    controlEvent,
     ...rest
   } = props;
 
   const ref = useRef<any>();
   const [animationExist, setAnimationExist] = useState(false);
   const prevModelRotationRef = useRef<Array<any>>([]);
-  const [controlEvent, setControlEvent] = useState<ModelControl>();
   const [controlModel, setControlModel] = useState();
 
   const { gl, mouse, camera } = useThree();
@@ -117,12 +116,6 @@ const Draggable3DModel = (props: any) => {
     Emitter.on(EMIT_KEY_RIGHT, () => {
       isSelected && doRightAction();
     });
-    Emitter.on(EMIT_CONTROL_EVENT, (payload) => {
-      isSelected &&
-        setControlEvent({
-          ...payload?.control,
-        });
-    });
     Emitter.on(COMMIT_CONTROL_ACTION, (payload) => {
       isSelected && setControlModel(payload);
     });
@@ -184,19 +177,6 @@ const Draggable3DModel = (props: any) => {
     updateModel({
       uuid: model.uuid,
       animation: animationExist,
-      control:
-        animationExist &&
-        (model.control || {
-          show_model: true,
-          show_skt: false,
-          activate_all: true,
-          continue_model: true,
-          single_step: {
-            enabled: false,
-            event: false,
-            size_of_next: 0.05,
-          },
-        }),
     });
   }, [animationExist]);
 

@@ -7,8 +7,8 @@ import PusStpAccord from "./PusStpAccord";
 import BlendWeightAccord from "./BlendWeightAccord";
 import GeneralSpdAccord from "./GeneralSpdAccord";
 import CrossfadingAccord from "./CrossfadingAccord";
-import { Model, ModelControl } from "../../store/modelReducer";
-import Emitter, { EMIT_CONTROL_EVENT } from "../../service/emitter";
+import { Model } from "../../store/modelReducer";
+import { Emitter, EMIT_CONTROL_EVENT, ModelControl } from "../../service";
 
 const ControlPanel = (props: any) => {
   const modelRedx = useSelector((state: any) => state.model);
@@ -45,9 +45,9 @@ const ControlPanel = (props: any) => {
     setControl({ ...control, ...updatedControl });
   };
 
-  useEffect(() => {
-    Emitter.emit(EMIT_CONTROL_EVENT, { control });
-  }, [control]);
+  // useEffect(() => {
+  //   Emitter.emit(EMIT_CONTROL_EVENT, { control });
+  // }, [control]);
 
   return (
     <>
@@ -55,10 +55,10 @@ const ControlPanel = (props: any) => {
         <>
           <VisibilityAccord updateModelControl={updateModelControl} />
           <ActDeactAccord updateModelControl={updateModelControl} />
-          <PusStpAccord updateModelControl={updateModelControl} />
-          <CrossfadingAccord updateModelControl={updateModelControl} />
+          {/* <PusStpAccord updateModelControl={updateModelControl} /> */}
+          {/* <CrossfadingAccord updateModelControl={updateModelControl} />
           <BlendWeightAccord updateModelControl={updateModelControl} />
-          <GeneralSpdAccord updateModelControl={updateModelControl} />
+          <GeneralSpdAccord updateModelControl={updateModelControl} /> */}
         </>
       )}
     </>

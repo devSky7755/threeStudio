@@ -15,11 +15,28 @@ import {
   SELECT_MODEL,
   UPDATE_MODEL,
 } from "../../store/actions";
-import Emitter, { EMIT_KEY_LEFT, EMIT_KEY_RIGHT } from "../../service/emitter";
+import {
+  Emitter,
+  EMIT_CONTROL_EVENT,
+  EMIT_KEY_LEFT,
+  EMIT_KEY_RIGHT,
+  ModelControl,
+} from "../../service";
 
 const SceneRenderer = () => {
   const [isDragging, setIsDragging] = useState(false);
   const modelRedx = useSelector((state: any) => state.model);
+  const [controlEvent, setControlEvent] = useState<ModelControl>({
+    show_model: true,
+    show_skt: false,
+    activate_all: true,
+    continue_model: true,
+    single_step: {
+      enabled: false,
+      event: false,
+      size_of_next: 0.05,
+    },
+  });
   const dispatch = useDispatch();
 
   const floorPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
@@ -62,8 +79,14 @@ const SceneRenderer = () => {
   };
 
   useEffect(() => {
+    Emitter.on(EMIT_CONTROL_EVENT, (payload) => {
+      setControlEvent({
+        ...payload?.control,
+      });
+    });
     document.addEventListener("keydown", downHandler);
     return () => {
+      Emitter.offAll(EMIT_CONTROL_EVENT);
       document.removeEventListener("keydown", downHandler);
     };
   });
@@ -89,7 +112,7 @@ const SceneRenderer = () => {
                       key={"model" + index}
                       setIsDragging={setIsDragging}
                       model={model}
-                      color={model.color}
+                      controlEvent={isSelected ? controlEvent : {}}
                       floorPlane={floorPlane}
                       isSelected={isSelected}
                       onSelectedModel={onSelectedModel}
