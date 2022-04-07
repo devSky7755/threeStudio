@@ -11,7 +11,8 @@ import {
 } from "../../../service";
 
 export default function SoldierModel(props: any) {
-  const { setAnimationExist, controlEvent, controlModel, ...rest } = props;
+  const { setAnimationExist, controlEvent, controlModel, accel, ...rest } =
+    props;
 
   const group = useRef();
   // useHelper(controlEvent?.show_skt && group, THREE.SkeletonHelper);
@@ -74,6 +75,23 @@ export default function SoldierModel(props: any) {
   useEffect(() => {
     controlEvent?.single_step?.enabled && toSingleStep();
   }, [controlEvent?.single_step?.enabled, controlEvent?.single_step?.event]);
+
+  useEffect(() => {
+    const limitStep = 9;
+    if (accel < limitStep) {
+      setWeight(idleAction, (limitStep - accel) / limitStep);
+      setWeight(walkAction, accel / limitStep);
+      setWeight(runAction, 0);
+    } else if (accel < limitStep * 2 && accel >= limitStep) {
+      setWeight(idleAction, 0);
+      setWeight(walkAction, (limitStep * 2 - accel) / limitStep);
+      setWeight(runAction, (accel - limitStep) / limitStep);
+    } else {
+      setWeight(idleAction, 0);
+      setWeight(walkAction, 0);
+      setWeight(runAction, 1);
+    }
+  }, [accel]);
 
   useEffect(() => {
     if (!controlModel?.action) return;

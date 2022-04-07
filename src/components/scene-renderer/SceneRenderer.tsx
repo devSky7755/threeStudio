@@ -19,7 +19,9 @@ import {
   Emitter,
   EMIT_CONTROL_EVENT,
   EMIT_KEY_LEFT,
+  EMIT_KEY_LEFT_UP,
   EMIT_KEY_RIGHT,
+  EMIT_KEY_RIGHT_UP,
   ModelControl,
 } from "../../service";
 
@@ -79,6 +81,19 @@ const SceneRenderer = () => {
     }
   };
 
+  const upHandler = ({ key }: { key: string }) => {
+    switch (key) {
+      case "ArrowLeft":
+        Emitter.emit(EMIT_KEY_LEFT_UP, {});
+        break;
+      case "ArrowRight":
+        Emitter.emit(EMIT_KEY_RIGHT_UP, {});
+        break;
+      default:
+        break;
+    }
+  };
+
   useEffect(() => {
     Emitter.on(EMIT_CONTROL_EVENT, (payload) => {
       setControlEvent({
@@ -86,22 +101,13 @@ const SceneRenderer = () => {
       });
     });
     document.addEventListener("keydown", downHandler);
+    document.addEventListener("keyup", upHandler);
     return () => {
       Emitter.offAll(EMIT_CONTROL_EVENT);
       document.removeEventListener("keydown", downHandler);
+      document.removeEventListener("keyup", upHandler);
     };
   });
-
-  // useEffect(() => {
-  //   if (canvasRef && canvasRef.current) {
-  //     console.log("listener on");
-  //     canvasRef.current.addEventListener("keydown", downHandler);
-  //     return function cleanup() {
-  //       console.log("listener off");
-  //       canvasRef.current.removeEventListener("keydown", downHandler);
-  //     };
-  //   }
-  // }, []);
 
   return (
     <Droppable droppableId="CANVAS">
