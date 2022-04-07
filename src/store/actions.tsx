@@ -4,7 +4,3 @@ export const DESELECT_MODEL = "@model/DESELECT_MODEL";
 export const SET_MODEL_COLOR = "@model/SET_MODEL_COLOR";
 export const UPDATE_MODEL = "@model/UPDATE_MODEL";
 export const DELETE_SEL_MODEL = "@model/DELETE_SEL_MODEL";
-
-export const WALK_ACTION = "walkAction";
-export const IDLE_ACTION = "idleAction";
-export const RUN_ACTION = "runAction";

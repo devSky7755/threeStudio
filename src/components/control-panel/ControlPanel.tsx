@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import VisibilityAccord from "./VisibilityAccord";
 import ActDeactAccord from "./ActDeactAccord";
@@ -45,9 +45,9 @@ const ControlPanel = (props: any) => {
     setControl({ ...control, ...updatedControl });
   };
 
-  // useEffect(() => {
-  //   Emitter.emit(EMIT_CONTROL_EVENT, { control });
-  // }, [control]);
+  useEffect(() => {
+    Emitter.emit(EMIT_CONTROL_EVENT, { control });
+  }, [control]);
 
   return (
     <>
@@ -55,10 +55,10 @@ const ControlPanel = (props: any) => {
         <>
           <VisibilityAccord updateModelControl={updateModelControl} />
           <ActDeactAccord updateModelControl={updateModelControl} />
-          {/* <PusStpAccord updateModelControl={updateModelControl} /> */}
-          {/* <CrossfadingAccord updateModelControl={updateModelControl} />
+          <PusStpAccord updateModelControl={updateModelControl} />
+          <CrossfadingAccord updateModelControl={updateModelControl} />
           <BlendWeightAccord updateModelControl={updateModelControl} />
-          <GeneralSpdAccord updateModelControl={updateModelControl} /> */}
+          <GeneralSpdAccord updateModelControl={updateModelControl} />
         </>
       )}
     </>

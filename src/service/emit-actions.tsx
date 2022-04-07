@@ -7,3 +7,7 @@ export const EMIT_WEIGHT_CHANGED_BY_CONTROL =
 export const EMIT_TIME_SCALE_CHANGED_BY_CONTROL =
   "control/time-scale-changed-by-control";
 export const COMMIT_CONTROL_ACTION = "control/COMMIT_ACTION";
+
+export const WALK_ACTION = "walkAction";
+export const IDLE_ACTION = "idleAction";
+export const RUN_ACTION = "runAction";

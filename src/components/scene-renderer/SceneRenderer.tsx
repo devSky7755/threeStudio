@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
@@ -38,6 +38,7 @@ const SceneRenderer = () => {
     },
   });
   const dispatch = useDispatch();
+  const canvasRef = useRef<any>();
 
   const floorPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 
@@ -91,6 +92,17 @@ const SceneRenderer = () => {
     };
   });
 
+  // useEffect(() => {
+  //   if (canvasRef && canvasRef.current) {
+  //     console.log("listener on");
+  //     canvasRef.current.addEventListener("keydown", downHandler);
+  //     return function cleanup() {
+  //       console.log("listener off");
+  //       canvasRef.current.removeEventListener("keydown", downHandler);
+  //     };
+  //   }
+  // }, []);
+
   return (
     <Droppable droppableId="CANVAS">
       {(provided) => (
@@ -99,7 +111,7 @@ const SceneRenderer = () => {
           ref={provided.innerRef}
           {...provided.droppableProps}
         >
-          <Canvas className="canvas">
+          <Canvas className="canvas" ref={canvasRef}>
             <ambientLight />
             <spotLight intensity={1} position={[5, 20, 20]} />
 

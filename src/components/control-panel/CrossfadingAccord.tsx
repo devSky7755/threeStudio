@@ -11,7 +11,7 @@ import ButtonGroup from "@mui/material/ButtonGroup";
 import MuiInput from "@mui/material/Input";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
-import { IDLE_ACTION, RUN_ACTION, WALK_ACTION } from "../../store/actions";
+import { IDLE_ACTION, RUN_ACTION, WALK_ACTION } from "../../service/emit-actions";
 import { Emitter, COMMIT_CONTROL_ACTION } from "../../service";
 
 const Item = styled(Typography)(({ theme }) => ({
