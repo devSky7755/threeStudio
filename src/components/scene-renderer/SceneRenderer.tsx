@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { Box, OrbitControls, Stats } from "@react-three/drei";
 import * as THREE from "three";
 import { useDispatch, useSelector } from "react-redux";
@@ -152,41 +152,50 @@ const SceneRenderer = () => {
           ref={provided.innerRef}
           {...provided.droppableProps}
         >
-          <Canvas className="canvas" ref={canvasRef}>
-            <ambientLight />
-            <spotLight intensity={1} position={[5, 20, 20]} />
+          <Canvas
+            className="canvas"
+            ref={canvasRef}
+            shadows
+            camera={{ position: [0, 5, 10] }}
+          >
+            <Suspense fallback={null}>
+              <ambientLight />
+              <spotLight intensity={1} position={[0, 20, 0]} />
 
-            <Physics>
-              <group dispose={null} onPointerMissed={onPointerMissed}>
-                {modelRedx.models.map((model: Model, index: number) => {
-                  const isSelected = modelRedx.selModel === model.uuid;
-                  return (
-                    <Suspense fallback={null} key={index}>
-                      <Draggable3DModel
-                        key={"model" + index}
-                        setIsDragging={setIsDragging}
-                        model={model}
-                        controlEvent={isSelected ? controlEvent : {}}
-                        floorPlane={floorPlane}
-                        isSelected={isSelected}
-                        onSelectedModel={onSelectedModel}
-                        updateModel={updateModel}
-                      />
-                    </Suspense>
-                  );
-                })}
-              </group>
-              <Ground />
-              {Array(10)
-                .fill(null)
-                .map((_, index) => {
-                  return (
-                    <PhysicalBox key={index} position={[0, index * 2, 0]} />
-                  );
-                })}
-            </Physics>
-            <primitive object={new THREE.AxesHelper(10)} />
-            <OrbitControls minZoom={10} maxZoom={50} enabled={!isDragging} />
+              <Physics>
+                <group dispose={null} onPointerMissed={onPointerMissed}>
+                  {modelRedx &&
+                    modelRedx.models &&
+                    modelRedx.models.map((model: Model, index: number) => {
+                      const isSelected = modelRedx.selModel === model.uuid;
+                      return (
+                        <Suspense fallback={null} key={index}>
+                          <Draggable3DModel
+                            key={"model" + index}
+                            setIsDragging={setIsDragging}
+                            model={model}
+                            controlEvent={isSelected ? controlEvent : {}}
+                            floorPlane={floorPlane}
+                            isSelected={isSelected}
+                            onSelectedModel={onSelectedModel}
+                            updateModel={updateModel}
+                          />
+                        </Suspense>
+                      );
+                    })}
+                </group>
+                <Ground />
+                {Array(15)
+                  .fill(null)
+                  .map((_, index) => {
+                    return (
+                      <PhysicalBox key={index} position={[0, index * 2, 0]} />
+                    );
+                  })}
+              </Physics>
+              <primitive object={new THREE.AxesHelper(10)} />
+              <OrbitControls minZoom={10} maxZoom={50} enabled={!isDragging} />
+            </Suspense>
           </Canvas>
           {provided.placeholder}
         </div>

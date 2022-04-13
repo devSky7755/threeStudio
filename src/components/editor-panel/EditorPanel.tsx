@@ -45,6 +45,7 @@ const EditorPanel = (props: any) => {
   );
 
   useEffect(() => {
+    if (!modelRedx || !modelRedx.models) return;
     const sModel = modelRedx.models.find(
       (model: Model) => model.uuid === modelRedx.selModel
     );

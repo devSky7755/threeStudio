@@ -36,7 +36,7 @@ const modelReducer = (state = initialState, action: any) => {
           use_jsx: action.payload?.use_jsx || false,
           rotation: [0, Math.PI / 2, 0],
         };
-        const models = [...state.models, newModel];
+        const models = [...(state.models || []), newModel];
         const selModel = newModel.uuid;
         return {
           ...state,
@@ -62,7 +62,7 @@ const modelReducer = (state = initialState, action: any) => {
 
     case actionTypes.SET_MODEL_COLOR:
       if (!state.selModel) return state;
-      const models = state.models.map((model) => {
+      const models = (state.models || []).map((model) => {
         if (model.uuid === state.selModel) {
           model.color = action.payload?.color;
         }
@@ -74,7 +74,7 @@ const modelReducer = (state = initialState, action: any) => {
       };
 
     case actionTypes.UPDATE_MODEL:
-      const nModels = state.models.map((model) => {
+      const nModels = (state.models || []).map((model) => {
         if (model.uuid === action.payload?.model?.uuid) {
           return { ...model, ...action.payload?.model };
         }
@@ -86,7 +86,7 @@ const modelReducer = (state = initialState, action: any) => {
       };
 
     case actionTypes.DELETE_SEL_MODEL:
-      const dModels = state.models.filter((model) => {
+      const dModels = (state.models || []).filter((model) => {
         return model.uuid !== state.selModel;
       });
       return {

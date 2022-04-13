@@ -19,7 +19,9 @@ import {
   Physics,
   PhysicsStats,
   ShapeType,
+  SoftBodyType,
   useRigidBody,
+  useSoftBody,
 } from "use-ammojs";
 
 interface OrgColor {
@@ -41,8 +43,9 @@ const Draggable3DModel = (props: any) => {
 
   // const ref = useRef<any>();
   const { gl, mouse, camera } = useThree();
+  const [threePosition, setThreePosition] = useState<Array<number>>([]);
 
-  const cacluate3DPosFrom2DPos = (pos: any): number[] => {
+  const cacluate3DPosFrom2DPos = (pos: any, yKeep = false): number[] => {
     const planeIntersectPoint = new Vector3(0, 0, 0);
     var raycaster = new Raycaster();
     mouse.set(
@@ -51,15 +54,21 @@ const Draggable3DModel = (props: any) => {
     );
     raycaster.setFromCamera(mouse, camera);
     raycaster.ray.intersectPlane(floorPlane, planeIntersectPoint);
-    return [planeIntersectPoint.x, planeIntersectPoint.y, 0];
+    let newThreePos = [planeIntersectPoint.x, planeIntersectPoint.y, 0];
+    if (yKeep && threePosition.length > 0) {
+      newThreePos = [planeIntersectPoint.x, threePosition[1], 0];
+    }
+    setThreePosition(newThreePos);
+    return newThreePos;
   };
 
-  const threeDPos = cacluate3DPosFrom2DPos(model.position);
-  const [rigRef] = useRigidBody(() => ({
-    bodyType: BodyType.DYNAMIC,
-    shapeType: ShapeType.BOX,
-    position: new Vector3(threeDPos[0], threeDPos[1], threeDPos[2]),
-  }));
+  const rigRef = useRef<any>();
+  // const [rigRef] = useRigidBody(() => ({
+  //   bodyType: BodyType.DYNAMIC,
+  //   shapeType: ShapeType.SPHERE,
+  //   position: new Vector3(threeDPos[0], threeDPos[1], threeDPos[2]),
+  //   // emitCollisionEvents: true,
+  // }));
 
   const moveToNewPos = (
     threeDPos: any,
@@ -114,7 +123,7 @@ const Draggable3DModel = (props: any) => {
     };
     const rotation = [0, -Math.PI / 2, 0];
     setPosition(newTempPos);
-    moveToNewPos(cacluate3DPosFrom2DPos(newTempPos), rotation, false);
+    moveToNewPos(cacluate3DPosFrom2DPos(newTempPos, true), rotation, false);
     debounceUpdateModel(newTempPos, rotation);
   }, [position.x, accel]);
 
@@ -128,7 +137,7 @@ const Draggable3DModel = (props: any) => {
     };
     const rotation = [0, Math.PI / 2, 0];
     setPosition(newTempPos);
-    moveToNewPos(cacluate3DPosFrom2DPos(newTempPos), rotation, false);
+    moveToNewPos(cacluate3DPosFrom2DPos(newTempPos, true), rotation, false);
     debounceUpdateModel(newTempPos, rotation);
   }, [position.x, accel]);
 
