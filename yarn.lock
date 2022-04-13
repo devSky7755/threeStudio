@@ -2687,6 +2687,15 @@ ajv@^8.0.0, ajv@^8.6.0, ajv@^8.8.0:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
+ammo-debug-drawer@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/ammo-debug-drawer/-/ammo-debug-drawer-1.0.1.tgz#c1d84d0342905cf7c08301e6551892a23c13955d"
+  integrity sha512-oPvQh5CQKgFQpIuBMMKxT019aYoONOEnBLn91dAg3CrMWdSP/Om8rLWRX0VkAk45SEK/B0ybXB7nsjXsz8QEBw==
+
+ammo.js@kripken/ammo.js:
+  version "0.0.2"
+  resolved "https://codeload.github.com/kripken/ammo.js/tar.gz/7a574978fb28164a0a1510831eae52958edb4265"
+
 ansi-escapes@^4.2.1, ansi-escapes@^4.3.1:
   version "4.3.2"
   resolved "https://registry.npmjs.org/ansi-escapes/-/ansi-escapes-4.3.2.tgz"
@@ -3281,7 +3290,7 @@ check-types@^11.1.1:
   resolved "https://registry.npmjs.org/check-types/-/check-types-11.1.2.tgz"
   integrity sha512-tzWzvgePgLORb9/3a0YenggReLKAIb2owL03H2Xdoe5pKcUyWRSEQ8xfCar8t2SIAuEDwtmx2da1YB52YuHQMQ==
 
-chevrotain@^10.1.1:
+chevrotain@^10.1.1, chevrotain@^10.1.2:
   version "10.1.2"
   resolved "https://registry.npmjs.org/chevrotain/-/chevrotain-10.1.2.tgz"
   integrity sha512-hvRiQuhhTZxkPMGD/dke+s1EGo8AkKDBU05CcufBO278qgAQSwIC4QyLdHz0CFHVtqVYWjlAS5D1KwvBbaHT+w==
@@ -4519,12 +4528,7 @@ etag@~1.8.1:
   resolved "https://registry.npmjs.org/etag/-/etag-1.8.1.tgz"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
 
-eventemitter3@^4.0.0:
-  version "4.0.7"
-  resolved "https://registry.npmjs.org/eventemitter3/-/eventemitter3-4.0.7.tgz"
-  integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
-
-eventemitter3@^4.0.7:
+eventemitter3@^4.0.0, eventemitter3@^4.0.7:
   version "4.0.7"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
@@ -8748,6 +8752,22 @@ three-mesh-bvh@^0.5.4:
   resolved "https://registry.npmjs.org/three-mesh-bvh/-/three-mesh-bvh-0.5.5.tgz"
   integrity sha512-WPsEXLfUh+8n2CcWaDnBm4q3c6PbISPbXOBNYt8VLEOTATXP8UqAfEyEBmQU8B9h5FJSSccdXXlHiexO3hZezg==
 
+three-stdlib@^2.4.0:
+  version "2.9.1"
+  resolved "https://registry.yarnpkg.com/three-stdlib/-/three-stdlib-2.9.1.tgz#300abf6cf12ab388e515fd8572217288dffe4736"
+  integrity sha512-e+Hyd47ssVTy2UzUfmaccB7m30qITVMdvGs/QypeGdJa3uwhw1zR9jO/ce61S65Omiy/oGDMWG8dJIZxyQ7u8w==
+  dependencies:
+    "@babel/runtime" "^7.16.7"
+    "@webgpu/glslang" "^0.0.15"
+    chevrotain "^10.1.2"
+    draco3d "^1.4.1"
+    fflate "^0.6.9"
+    ktx-parse "^0.2.1"
+    mmd-parser "^1.0.4"
+    opentype.js "^1.3.3"
+    potpack "^1.0.1"
+    zstddec "^0.0.2"
+
 three-stdlib@^2.8.6, three-stdlib@^2.8.7:
   version "2.8.8"
   resolved "https://registry.npmjs.org/three-stdlib/-/three-stdlib-2.8.8.tgz"
@@ -9016,6 +9036,16 @@ uri-js@^4.2.2:
   integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==
   dependencies:
     punycode "^2.1.0"
+
+use-ammojs@^0.2.21:
+  version "0.2.21"
+  resolved "https://registry.yarnpkg.com/use-ammojs/-/use-ammojs-0.2.21.tgz#fe12e70055a90dc866c84b66a5b690817c7974fe"
+  integrity sha512-W6lVEOg1Sw7ZU1mcQdT07F9d347Gyb3wwFhvtz0G5masu+Rf0g0bSUo4cAAD0hIo2U+pQTXZZUyVLpMB/cP1KQ==
+  dependencies:
+    ammo-debug-drawer "^1.0.1"
+    ammo.js kripken/ammo.js
+    stats.js "^0.17.0"
+    three-stdlib "^2.4.0"
 
 use-asset@^1.0.4:
   version "1.0.4"

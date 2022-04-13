@@ -14,6 +14,14 @@ import {
 } from "../../service";
 import { debounce } from "lodash";
 
+import {
+  BodyType,
+  Physics,
+  PhysicsStats,
+  ShapeType,
+  useRigidBody,
+} from "use-ammojs";
+
 interface OrgColor {
   initiated: boolean;
   values: any[];
@@ -31,7 +39,7 @@ const Draggable3DModel = (props: any) => {
     ...rest
   } = props;
 
-  const ref = useRef<any>();
+  // const ref = useRef<any>();
   const { gl, mouse, camera } = useThree();
 
   const cacluate3DPosFrom2DPos = (pos: any): number[] => {
@@ -45,6 +53,13 @@ const Draggable3DModel = (props: any) => {
     raycaster.ray.intersectPlane(floorPlane, planeIntersectPoint);
     return [planeIntersectPoint.x, planeIntersectPoint.y, 0];
   };
+
+  const threeDPos = cacluate3DPosFrom2DPos(model.position);
+  const [rigRef] = useRigidBody(() => ({
+    bodyType: BodyType.DYNAMIC,
+    shapeType: ShapeType.BOX,
+    position: new Vector3(threeDPos[0], threeDPos[1], threeDPos[2]),
+  }));
 
   const moveToNewPos = (
     threeDPos: any,
@@ -211,6 +226,8 @@ const Draggable3DModel = (props: any) => {
   const initiateOrgColor = () => {
     const values: any = [];
     let index = 0;
+    const ref: any = rigRef;
+
     ref.current.traverse(function (mesh: any) {
       if (mesh instanceof Mesh) {
         values.push({
@@ -227,6 +244,7 @@ const Draggable3DModel = (props: any) => {
   };
 
   const setObjectColor = (color: string) => {
+    const ref: any = rigRef;
     if (ref) {
       if (color) {
         if (!originColor.initiated) {
@@ -260,7 +278,7 @@ const Draggable3DModel = (props: any) => {
       {...bind()}
       castShadow
       receiveShadow
-      ref={ref}
+      ref={rigRef}
     >
       <RenderModel
         model={model}
